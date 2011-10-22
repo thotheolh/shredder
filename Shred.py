@@ -1,9 +1,11 @@
 #!/usr/bin/python
 import os
-def shred(filename):
-	os.system(filename)
+def shred(filename, iterations):
+	#shredding function
+	command = "shred " + "-n" + iterations + " " + filename
+	os.system(command)
 
-filename = "shred "
-filename += raw_input("Enter file to shred")
-
-shred(filename)
+filename = raw_input("Enter file to shred:	")
+iterations = raw_input("Iterations:	")
+#shred call
+shred(filename, iterations)
