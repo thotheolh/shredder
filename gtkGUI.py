@@ -17,9 +17,6 @@ if importStatus:
 
     class gtkGUI():
 
-        def __init__(self):
-            print 'gtkGUI imported'
-
         def startGUI(self):
             print 'GUI Started'
             return None
@@ -27,8 +24,10 @@ if importStatus:
         def checkGtkVersion(self):
             return gtk.gtk_version
         
-
         def checkPyGTKVersion(self):
             return gtk.pygtk_version
 
-
+        def __init__(self):
+            print 'gtkGUI imported'
+            array = self.checkGtkVersion
+            print 'Main Version: ',array
