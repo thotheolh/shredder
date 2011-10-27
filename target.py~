@@ -1,0 +1,8 @@
+#!/usr/bin/python
+
+class target(self):
+	filename = ""
+	directory = False
+	iterations = 3
+	zero = ""
+	remove = ""

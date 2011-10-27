@@ -26,7 +26,7 @@ def rshred(file1):
 		os.system(command)
 
 	#remove directory - "clean up"
-	if(file1.remove == "y"):
+	if(remove == "y"):
 		removedir = "rm -r " + file1.filename
 		os.system(removedir)
 

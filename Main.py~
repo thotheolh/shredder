@@ -26,7 +26,7 @@ file1.iterations = raw_input("Iterations:	")
 file1.zero = raw_input("Zero after shredding? [y/n]")
 
 #check zero input is boolean and expected
-while ((file1.zero != "y") and (file1.zero != "n")):
+while ((file1.zero != "y") and (zero != "n")):
 	file1.zero = ""
 	file1.zero = raw_input("Zero after shredding? [y/n]")
 
