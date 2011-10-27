@@ -4,20 +4,14 @@
 import os
 from Shred import shred
 from Recursive import rshred
+from GetFile import GetFile
 
 
 #shred options input:
 
-#filename of target file here
-filename = raw_input("Enter file to shred:	")
-
-#check file exists
-while((os.path.exists(filename)) != True):
-	print'Error: file \"', filename, '\" does not exist'
-	filename = ""
-	filename = raw_input("Enter file to shred:	")
-
-#check for directory filename
+#get and parse filename
+filename = GetFile()
+#check directories
 directory = False
 if((os.path.isdir(filename)) == True):
 	directory = True

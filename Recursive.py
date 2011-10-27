@@ -7,6 +7,11 @@
 
 import os
 def rshred(filename, iterations, zero, remove):
+
+	#check user:
+	confirmdir = raw_input("This is a directory-continue? [y/n]")
+	while((confirmdir != "y") and (confirmdir != "n")):
+		confirmdir = raw_input("This is a directory-continue? [y/n]")
 	#shredding function:
 
 	#concantenate and parse variables passed
@@ -17,7 +22,8 @@ def rshred(filename, iterations, zero, remove):
 	
 	
 	#final system call
-	os.system(command)
+	if(confirmdir == "y"):
+		os.system(command)
 
 	#remove directory - "clean up"
 	if(remove == "y"):
