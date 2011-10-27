@@ -1,0 +1,28 @@
+#####Shredder < 0.0.0 release documentation.#####
+
+#Synopsis:#
+	Improved "shred" written in python and a bit of BASH. 		Currently includes directory support and easy-to-follow 	prompts. Will include GUI.
+
+#User guide:#
+	In the source directory, run "chmod +x *.py". Then run 		"./Main.py" and follow the prompts. ANY files and/or 		DIRECTORIES **will** be destroyed entirely if referenced. You 		have been warned, and no developers take any responsiblity 		for wiped root partitions(unless, that is, that is what you 		wanted to do, in which case we will take credit). Although we 		will sympathise.
+
+#File uses(ignore .pyc precompiled bytecode):#
+
+-Main.py:
+	...handles calls to the "target" class instance file1, parses 		input/output for errors, and finally calls shred()/rshred().
+
+-Target.py:
+	...contains the "target" class. Includes variables for 		filename, zeroing, removal, directory(boolean), and 		iterations 
+
+-GetFile.py:
+	...contains the getfile() function. This retrieves a filename 		from stdin, and checks for its existence. Returns filename.
+
+-Shred.py:
+	...receives an instance of(parsed) target class, concantenates 		the required string for the system() call, and executes 	os.system(command)
+
+-Recursive.py:
+	...same as Shred.py above, but includes support for 		directories in filename. Only called if directory == True, as 		can be very dangerous to data.
+
+<TODO-Write documentation for various GUI files. Currently thotheolh's area. ;) />
+
+
