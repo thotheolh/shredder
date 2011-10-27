@@ -3,6 +3,7 @@
 #import shredding algorithm:
 import os
 from Shred import shred
+from Recursive import rshred
 
 
 #shred options input:
@@ -11,11 +12,16 @@ from Shred import shred
 filename = raw_input("Enter file to shred:	")
 
 #check file exists
-while((os.path.isfile(filename)) != True):
+while((os.path.exists(filename)) != True):
 	print'Error: file \"', filename, '\" does not exist'
 	filename = ""
 	filename = raw_input("Enter file to shred:	")
 
+#check for directory filename
+directory = False
+if((os.path.isdir(filename)) == True):
+	directory = True
+	
 #iterations of shred command
 iterations = raw_input("Iterations:	")
 
@@ -36,4 +42,7 @@ while ((remove != "y") and (remove != "n")):
 	remove = raw_input("Zero after shredding? [y/n]")
 
 #call to shred function from shred.py
-shred(filename, iterations, zero, remove)
+if(directory == True):
+	rshred(filename, iterations, zero, remove)
+if(directory == False):
+	shred(filename, iterations, zero, remove)
