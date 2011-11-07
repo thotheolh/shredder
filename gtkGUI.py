@@ -13,22 +13,18 @@ except ImportError:
     print "Please download and install GTK and PyGTK."
     importStatus = False
 
-if importStatus:
+def gtkGUI():
+	try:
+		import gtk
+		importStatus = True
 
-    class gtkGUI():
-
-        def __init__(self):
-            print 'gtkGUI imported'
-
-        def startGUI(self):
-            print 'GUI Started'
-            return None
-
-        def checkGtkVersion(self):
-            return gtk.gtk_version
-        
-
-        def checkPyGTKVersion(self):
-            return gtk.pygtk_version
-
-
+	except ImportError:
+		print "PyGTK module does not exist. Can't launch GUI !"
+		print "Please download and install GTK and PyGTK."
+		importStatus = False
+	import gtk
+	window=gtk.Window()
+	window.connect('destroy', lambda w: gtk.main_quit())
+	window.set_size_request(400, 600)
+	window.show_all()
+	gtk.main()
