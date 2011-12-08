@@ -10,8 +10,7 @@ if os.environ.get('KDE_FULL_SESSION') == 'true':
 elif os.environ.get('GNOME_DESKTOP_SESSION_ID'):
     desktop_environment = 'gnome'
     print 'Desktop is ',desktop_environment
-    gtk = gtkGUI()
-    gtk.startGUI()
+    gtkGUI()
 else:
     try:
         info = getoutput('xprop -root _DT_SAVE_MODE')

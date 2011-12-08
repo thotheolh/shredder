@@ -6,21 +6,27 @@
 
 
 import os
-def rshred(filename, iterations, zero, remove):
+def rshred(file1):
+
+	#check user:
+	confirmdir = raw_input("This is a directory-continue? [y/n]")
+	while((confirmdir != "y") and (confirmdir != "n")):
+		confirmdir = raw_input("This is a directory-continue? [y/n]")
 	#shredding function:
 
 	#concantenate and parse variables passed
-	command = "find " + filename + " -type f -exec shred -n" + iterations
-	if(zero == "y"):
+	command = "find " + file1.filename + " -type f -exec shred -n" + file1.iterations
+	if(file1.zero == "y"):
 		command += " -z"
 	command += " '{}' \;"
 	
 	
 	#final system call
-	os.system(command)
+	if(confirmdir == "y"):
+		os.system(command)
 
 	#remove directory - "clean up"
-	if(remove == "y"):
-		removedir = "rm -r " + filename
+	if(file1.remove == "y"):
+		removedir = "rm -r " + file1.filename
 		os.system(removedir)
 

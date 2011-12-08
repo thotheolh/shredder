@@ -4,45 +4,42 @@
 import os
 from Shred import shred
 from Recursive import rshred
+from GetFile import GetFile
+from target import target
 
 
 #shred options input:
+#new class
+file1 = target
 
-#filename of target file here
-filename = raw_input("Enter file to shred:	")
-
-#check file exists
-while((os.path.exists(filename)) != True):
-	print'Error: file \"', filename, '\" does not exist'
-	filename = ""
-	filename = raw_input("Enter file to shred:	")
-
-#check for directory filename
-directory = False
-if((os.path.isdir(filename)) == True):
-	directory = True
+#get and parse filename
+file1.filename = GetFile()
+#check directories
+file1.directory = False
+if((os.path.isdir(file1.filename)) == True):
+	file1.directory = True
 	
 #iterations of shred command
-iterations = raw_input("Iterations:	")
+file1.iterations = raw_input("Iterations:	")
 
 #overwrite file with zeros afterwards? <bool variable needed>
-zero = raw_input("Zero after shredding? [y/n]")
+file1.zero = raw_input("Zero after shredding? [y/n]")
 
 #check zero input is boolean and expected
-while ((zero != "y") and (zero != "n")):
-	zero = ""
-	zero = raw_input("Zero after shredding? [y/n]")
+while ((file1.zero != "y") and (file1.zero != "n")):
+	file1.zero = ""
+	file1.zero = raw_input("Zero after shredding? [y/n]")
 
 #remove file after shredding?
-remove = raw_input("Remove file after shredding[y/n]")
+file1.remove = raw_input("Remove file after shredding[y/n]")
 
 #check input for accuracy
-while ((remove != "y") and (remove != "n")):
-	remove = ""
-	remove = raw_input("Zero after shredding? [y/n]")
+while ((file1.remove != "y") and (file1.remove != "n")):
+	file1.remove = ""
+	file1.remove = raw_input("Zero after shredding? [y/n]")
 
 #call to shred function from shred.py
-if(directory == True):
-	rshred(filename, iterations, zero, remove)
-if(directory == False):
-	shred(filename, iterations, zero, remove)
+if(file1.directory == True):
+	rshred(file1)
+if(file1.directory == False):
+	shred(file1)
