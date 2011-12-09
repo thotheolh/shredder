@@ -10,6 +10,19 @@ class shreddable():
     zero = False
     remove = False
 
+#Access functions-------------------------------------
+    def access_filename(self, infilename):
+        self.filename = infilename
+
+    def access_iterations(self, initerations):
+        self.iterations = initerations
+
+    def access_zero(self, inzero):
+        self.zero = inzero
+
+    def access_remove(self,inremove):
+        self.remove = inremove
+
 #Member functions-------------------------------------
     def shred(self):
         command = "shred " + "-n" + str(self.iterations)
