@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 import sys
+import os
 
 importStatus = False
 
@@ -20,6 +21,8 @@ if importStatus:
     class gtkGUI():
 
         output = None
+        filenametf = None
+        chooser = None
 
         def __init__(self):
             print "Starting GTK Interface"
@@ -38,9 +41,38 @@ if importStatus:
             self.zerolbl = gtk.Label("Zero-ing:")
 
             ## Buttons
-            self.shredbtn = gtk.Button("Shred !")
-            self.filechoosebtn = gtk.Button("...")
-            self.trashbtn = gtk.Button("Trash")
+            self.shredbtn = gtk.Button()
+            self.shredbtn.connect("clicked", self.do_shred, None)
+            self.filechoosebtn = gtk.Button()
+            self.filechoosebtn.connect("clicked", self.get_filechooser_callback, None)
+            self.folderchoosebtn = gtk.Button()
+            self.folderchoosebtn.connect("clicked", self.get_folderchooser_callback, None)
+            self.trashbtn = gtk.Button()
+            self.trashbtn.connect("clicked", self.get_trash_callback, None)
+
+            ## Button Icons
+
+            # Shred button
+            self.shredimg = gtk.Image()
+            self.shredimg.set_from_file("img/shred.png")
+            self.shredbtn.add(self.shredimg)
+            
+            # File chooser button
+            self.fileimg = gtk.Image()
+            self.fileimg.set_from_file("img/file.png")
+            self.filechoosebtn.add(self.fileimg)
+
+            # Folder chooser button
+
+            self.folderimg = gtk.Image()
+            self.folderimg.set_from_file("img/folder.png")
+            self.folderchoosebtn.add(self.folderimg)
+
+            # Trash button
+
+            self.trashimg = gtk.Image()
+            self.trashimg.set_from_file("img/trash.png")
+            self.trashbtn.add(self.trashimg)
 
             ## Check Boxes
             self.zero = gtk.CheckButton(label=None)
@@ -61,7 +93,7 @@ if importStatus:
             self.output.set_editable(False)
             self.sw.add(self.output)
             self.frame = gtk.Frame()
-            self.frame.set_label(" Result: ")
+            self.frame.set_label(" Status: ")
             self.frame.set_shadow_type(gtk.SHADOW_ETCHED_OUT)
             self.frame.add(self.sw)
 
@@ -72,8 +104,12 @@ if importStatus:
             self.shredtooltip.set_tip(self.shredbtn, "Begin Shredding Files")
 
             # File choose button
-            self.filestooltip = gtk.Tooltips()
-            self.filestooltip.set_tip(self.filechoosebtn, "Choose files or folder")
+            self.filetooltip = gtk.Tooltips()
+            self.filetooltip.set_tip(self.filechoosebtn, "Choose a file")
+
+            # Folder choose button
+            self.foldertooltip = gtk.Tooltips()
+            self.foldertooltip.set_tip(self.folderchoosebtn, "Choose a folder")
 
             # Trash button
             self.trashtooltip = gtk.Tooltips()
@@ -89,7 +125,8 @@ if importStatus:
             self.filebox.pack_start(self.filelbl, expand=False, fill=False, padding=10)
             self.filebox.pack_start(self.filenametf, expand=False, fill=False, padding=0)
             self.filebox.pack_start(self.filechoosebtn, expand=False, fill=False, padding=10)
-            self.filebox.pack_start(self.trashbtn, expand=False, fill=False, padding=0)
+            self.filebox.pack_start(self.folderchoosebtn, expand=False, fill=False, padding=0)
+            self.filebox.pack_start(self.trashbtn, expand=False, fill=False, padding=10)
             self.vbox.pack_start(self.filebox, expand=False, fill=False, padding=0)
 
             # sctrlbox to contain shred control widgets
@@ -112,10 +149,11 @@ if importStatus:
             self.shredbox.pack_end(self.shredbtn, expand=False, fill=False, padding=5)
             self.vbox.pack_end(self.shredbox, expand=False, fill=False, padding=5)
 
+
             ## Presenting window
             self.window.add(self.vbox)
             self.window.show_all()      
-            self.insertText("helloworld")
+            # self.insertText("helloworld")
             gtk.main()
             return None
 
@@ -133,4 +171,44 @@ if importStatus:
                 print "Empty Output"
             else:
                 self.buffer = self.output.get_buffer()
-                self.buffer.insert_at_cursor(text)     
+                self.buffer.insert_at_cursor(text)
+
+        def get_trash_callback(self, widget, data=None):
+            loc = os.getenv("HOME")
+            self.filenametf.set_text(loc + "/.local/share/Trash")
+
+        def get_filechooser_callback(self, widget, data=None):
+            self.chooser = gtk.FileChooserDialog(title=None,action=gtk.FILE_CHOOSER_ACTION_OPEN,
+                                  buttons=(gtk.STOCK_CANCEL,gtk.RESPONSE_CANCEL,gtk.STOCK_OPEN,gtk.RESPONSE_OK))
+            self.chooser.set_default_response(gtk.RESPONSE_OK)
+            response = self.chooser.run()
+            if response == gtk.RESPONSE_OK:
+                self.filenametf.set_text(self.chooser.get_filename())
+            elif response == gtk.RESPONSE_CANCEL:
+                self.chooser.destroy()
+            self.chooser.destroy()
+
+        def get_folderchooser_callback(self, widget, data=None):
+            self.chooser = gtk.FileChooserDialog(title=None,action=gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER,
+                                  buttons=(gtk.STOCK_CANCEL,gtk.RESPONSE_CANCEL,gtk.STOCK_OPEN,gtk.RESPONSE_OK))
+            self.chooser.set_default_response(gtk.RESPONSE_OK)
+            response = self.chooser.run()
+            if response == gtk.RESPONSE_OK:
+                self.filenametf.set_text(self.chooser.get_filename())
+            elif response == gtk.RESPONSE_CANCEL:
+                self.chooser.destroy()
+            self.chooser.destroy()
+
+        def do_shred(self, widget, data=None):
+            filename = self.filenametf.get_text()
+            iter_num = self.itertf.get_text()
+            if iter_num.isdigit():
+                ## Proceed shredding operations
+                print "banzai"
+            else:
+                ## Throws a warning dialog
+                iter_warn_msg = "Iteration field only accepts positive integer numbers.\nPlease try again."
+                self.dialog = gtk.MessageDialog(None, gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_WARNING, gtk.BUTTONS_CLOSE, iter_warn_msg)
+                self.dialog.run()
+                self.dialog.destroy()
+                self.itertf.set_text("100")
