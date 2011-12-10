@@ -18,13 +18,13 @@ class shreddable():
         if(self.remove == True):
             command += " -u"
         command += " " + self.filename
-	os.system(command)
+    os.system(command)
 
     def rshred(self):
         command = "find " + self.filename + " -type f -exec shred -n" + str(self.iterations)
         if(self.zero == True):
             command += " -z"
-	
+    
         command += " '{}' \;"
         os.system(command)
 

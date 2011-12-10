@@ -1,20 +1,23 @@
-#!/usr/bin/python
+    #!/usr/bin/python
 
 import sys
 import os
+from shreddable import shreddable
 
 importStatus = False
 
 try:
-	import pygtk
-	pygtk.require('2.0')
-	import gtk
-	importStatus = True
+    import pygtk
+    pygtk.require('2.0')
+    import gtk
+    importStatus = True
 
 except ImportError:
     print "PyGTK module does not exist. Can't launch GUI !"
     print "Please download and install GTK and PyGTK."
     importStatus = False
+    
+target = shreddable()
 
 if importStatus:
 
@@ -204,7 +207,13 @@ if importStatus:
             iter_num = self.itertf.get_text()
             if iter_num.isdigit():
                 ## Proceed shredding operations
-                print "banzai"
+                target.iterations = iter_num
+                target.filename = filename
+                target.zero = False
+                target.remove = False
+                print target.iterations, target.filename, target.zero, target.remove
+                print "Here we go! Pray that it doesn't take anything bad out!"
+                target.destroy()
             else:
                 ## Throws a warning dialog
                 iter_warn_msg = "Iteration field only accepts positive integer numbers.\nPlease try again."

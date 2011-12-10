@@ -6,7 +6,7 @@ class kdeGUI:
         print 'kdeGUI imported'
 
     def startGUI(self):
-	print 'GUI Started'
+    print 'GUI Started'
         return None
 
     def checkGtkVersion(self):
