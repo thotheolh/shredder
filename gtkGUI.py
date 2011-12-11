@@ -184,6 +184,7 @@ if importStatus:
             self.chooser = gtk.FileChooserDialog(title=None,action=gtk.FILE_CHOOSER_ACTION_OPEN,
                                   buttons=(gtk.STOCK_CANCEL,gtk.RESPONSE_CANCEL,gtk.STOCK_OPEN,gtk.RESPONSE_OK))
             self.chooser.set_default_response(gtk.RESPONSE_OK)
+            self.chooser.set_current_folder(os.getenv("HOME"))
             response = self.chooser.run()
             if response == gtk.RESPONSE_OK:
                 self.filenametf.set_text(self.chooser.get_filename())
@@ -195,6 +196,7 @@ if importStatus:
             self.chooser = gtk.FileChooserDialog(title=None,action=gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER,
                                   buttons=(gtk.STOCK_CANCEL,gtk.RESPONSE_CANCEL,gtk.STOCK_OPEN,gtk.RESPONSE_OK))
             self.chooser.set_default_response(gtk.RESPONSE_OK)
+            self.chooser.set_current_folder(os.getenv("HOME"))
             response = self.chooser.run()
             if response == gtk.RESPONSE_OK:
                 self.filenametf.set_text(self.chooser.get_filename())
@@ -202,20 +204,48 @@ if importStatus:
                 self.chooser.destroy()
             self.chooser.destroy()
 
+        def disable_widgets(self):
+            self.filenametf.set_sensitive(False)
+            self.itertf.set_sensitive(False)
+            self.filechoosebtn.set_sensitive(False)
+            self.folderchoosebtn.set_sensitive(False)
+            self.trashbtn.set_sensitive(False)
+            self.zero.set_sensitive(False)
+            self.shredbtn.set_sensitive(False)
+            # self.insertText("Widgets disabled\n")
+
+        def enable_widgets(self):
+            self.filenametf.set_sensitive(True)
+            self.itertf.set_sensitive(True)
+            self.filechoosebtn.set_sensitive(True)
+            self.folderchoosebtn.set_sensitive(True)
+            self.trashbtn.set_sensitive(True)
+            self.zero.set_sensitive(True)
+            self.shredbtn.set_sensitive(True)
+            # self.insertText("Widgets enabled\n")
+
         def do_shred(self, widget, data=None):
             filename = self.filenametf.get_text()
             iter_num = self.itertf.get_text()
+            is_zero = self.zero.get_active()
+            ## Check if the iteration is a digit number, if not treat as invalid iterations
             if iter_num.isdigit():
-                ## Proceed shredding operations
+                # Proceed shredding operations
                 target.iterations = iter_num
                 target.filename = filename
-                target.zero = False
-                target.remove = False
-                print target.iterations, target.filename, target.zero, target.remove
-                print "Here we go! Pray that it doesn't take anything bad out!"
+                target.zero = is_zero
+                target.remove = True
+                target.gui = self
+                self.insertText("Target File: "+filename+"\nIterations: "+iter_num+", Zero-ing: "+str(is_zero)+"\n")
+                self.insertText("Here we go! Pray that it doesn't take anything bad out!\n")
+                # Begin shredding. Widgets disabled to prevent interruption in due process.
+                self.disable_widgets()
                 target.destroy()
+                self.enable_widgets()
+                # Finish shredding
+                self.insertText("Done with all the shredding! \nYou may proceed to exit or shred more stuff again.\n")
             else:
-                ## Throws a warning dialog
+                # Throws a warning dialog
                 iter_warn_msg = "Iteration field only accepts positive integer numbers.\nPlease try again."
                 self.dialog = gtk.MessageDialog(None, gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_WARNING, gtk.BUTTONS_CLOSE, iter_warn_msg)
                 self.dialog.run()
