@@ -18,7 +18,7 @@ class shreddable():
             command += " -z"
         if (self.remove == True):
             command += " -u"
-        command += " " + self.filename
+        command += " \"" + self.filename + "\""
 
         ## Check if GUI parameter is passed over. If GUI parameter is found, proceed to divert output to GUI output.
         if (self.gui != None):
@@ -29,7 +29,7 @@ class shreddable():
         os.system(command)
 
     def rshred(self):
-        command = "find " + self.filename + " -type f -exec shred -n" + str(self.iterations)
+        command = "find \"" + self.filename + "\" -type f -exec shred -n" + str(self.iterations)
         if (self.zero == True):
             command += " -z"
     
@@ -37,7 +37,7 @@ class shreddable():
         os.system(command)
 
         if (self.remove == True):
-            removedir = "rm -r " + self.filename
+            removedir = "rm -r \"" + self.filename + "\""
             os.system(removedir)
 
     def destroy(self):
@@ -48,8 +48,8 @@ class shreddable():
 
                 # Displays on the GUI output console the files that are being shredded at the moment
                 self.gui.insertText("Warning! - "+self.filename+" does NOT EXIST! An implementation bug on the filename section has occurred !\n")
-
-            sys.exit("ERROR: filename does not exist-developers-check implementation of filename section")
+            else:
+                sys.exit("ERROR: filename does not exist-developers-check implementation of filename section")
 
         if (os.path.isdir(self.filename) == True):
             self.rshred()

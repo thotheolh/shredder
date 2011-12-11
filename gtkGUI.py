@@ -234,7 +234,7 @@ if importStatus:
                 target.iterations = iter_num
                 target.filename = filename
                 target.zero = is_zero
-                target.remove = True
+                target.remove = False
                 target.gui = self
                 self.insertText("Target File: "+filename+"\nIterations: "+iter_num+", Zero-ing: "+str(is_zero)+"\n")
                 self.insertText("Here we go! Pray that it doesn't take anything bad out!\n")
