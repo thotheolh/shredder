@@ -209,7 +209,11 @@ if importStatus:
                 ## Proceed shredding operations
                 target.iterations = iter_num
                 target.filename = filename
-                target.zero = False
+                if(self.zero.get_active() == True):
+                    target.zero = True
+                
+                else:
+                    target.zero = False
                 target.remove = False
                 print target.iterations, target.filename, target.zero, target.remove
                 print "Here we go! Pray that it doesn't take anything bad out!"
