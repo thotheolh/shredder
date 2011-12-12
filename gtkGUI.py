@@ -2,6 +2,7 @@
 
 import sys
 import os
+import urllib
 from shreddable import shreddable
 
 importStatus = False
@@ -26,6 +27,7 @@ if importStatus:
         output = None
         filenametf = None
         chooser = None
+        dnd_list = [ ( 'text/uri-list', 0, 80 ) ]
 
         def __init__(self):
             print "Starting GTK Interface"
@@ -34,7 +36,7 @@ if importStatus:
         def startGUI(self):
             print "GUI Started"
             self.window = gtk.Window(gtk.WINDOW_TOPLEVEL)
-            self.window.set_title("Shredder - v0.1 (Alpha)")
+            self.window.set_title("Shredder - v0.1 (Beta)")
             self.window.set_border_width(10)
             self.window.connect("destroy", self.destroy)
 
@@ -86,6 +88,10 @@ if importStatus:
 
             ## Text Fields
             self.filenametf = gtk.Entry(max=0)
+            self.filenametf.connect("drag_data_received", on_drag_data_received)
+            self.filenametf.drag_dest_set( gtk.DEST_DEFAULT_MOTION |
+                  gtk.DEST_DEFAULT_HIGHLIGHT | gtk.DEST_DEFAULT_DROP,
+                  self.dnd_list, gtk.gdk.ACTION_COPY)
             self.itertf = gtk.Entry(max=0)
             self.itertf.set_width_chars(8)
             self.itertf.set_text("100")
@@ -281,3 +287,27 @@ if importStatus:
                 self.dialog.run()
                 self.dialog.destroy()
                 self.itertf.set_text("100")
+
+    def on_drag_data_received(widget, context, x, y, selection, target_type, timestamp):
+        if target_type == 80:
+            uri = selection.data.strip('\r\n\x00')
+            uri_splitted = uri.split() # we may have more than one file dropped
+            for uri in uri_splitted:
+                path = get_file_path_from_dnd_dropped_uri(uri)
+                widget.set_text(path)
+                
+    def get_file_path_from_dnd_dropped_uri(uri):
+        ## get the path to file
+        path = ""
+        if uri.startswith("file:\\\\\\"): # windows
+            # print "windows"
+            path = uri[8:] # 8 is len('file:///')
+        elif uri.startswith("file://"): # nautilus, rox
+            # print "nautilus"
+            path = uri[7:] # 7 is len('file://')
+        elif uri.startswith("file:"): # xffm
+            # print "xffm"
+            path = uri[5:] # 5 is len('file:')
+        path = urllib.url2pathname(path) # escape special chars
+        path = path.strip('\r\n\x00') # remove \r\n and NULL
+        return path
