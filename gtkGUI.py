@@ -41,7 +41,8 @@ if importStatus:
             ## Labels
             self.filelbl = gtk.Label("File / Folder: ")
             self.iterationlbl = gtk.Label("Shred Iterations: ")
-            self.zerolbl = gtk.Label("Zero-ing:")
+            self.zerolbl = gtk.Label("Zero-ing: ")
+            self.removelbl = gtk.Label("Remove: ")
 
             ## Buttons
             self.shredbtn = gtk.Button()
@@ -80,6 +81,8 @@ if importStatus:
             ## Check Boxes
             self.zero = gtk.CheckButton(label=None)
             self.zero.set_active(True)
+            self.remove = gtk.CheckButton(label=None)
+            self.remove.set_active(False)
 
             ## Text Fields
             self.filenametf = gtk.Entry(max=0)
@@ -118,6 +121,22 @@ if importStatus:
             self.trashtooltip = gtk.Tooltips()
             self.trashtooltip.set_tip(self.trashbtn, "Shred Trash bin")
 
+            # Zero-ing checkbox
+            self.zerotooltip = gtk.Tooltips()
+            self.zerotooltip.set_tip(self.zero, "Zero files when shredding")
+            self.zerolbltooltip = gtk.Tooltips()
+            self.zerolbltooltip.set_tip(self.zerolbl, "Zero files when shredding")
+
+            # Remove checkbox
+            self.removetooltip = gtk.Tooltips()
+            self.removetooltip.set_tip(self.remove, "Remove files after shredding")
+            self.removelbltooltip = gtk.Tooltips()
+            self.removelbltooltip.set_tip(self.removelbl, "Remove files after shredding")
+
+            # Iteration text field
+            self.itertftooltip = gtk.Tooltips()
+            self.itertftooltip.set_tip(self.itertf, "Shredding iterations per file")
+
             ## Packing widgets into window
 
             # Vertical box to contain all boxes
@@ -138,6 +157,8 @@ if importStatus:
             self.sctrlbox.pack_start(self.itertf, expand=False, fill=False, padding=0)
             self.sctrlbox.pack_start(self.zerolbl, expand=False, fill=False, padding=10)
             self.sctrlbox.pack_start(self.zero, expand=False, fill=False, padding=0)
+            self.sctrlbox.pack_start(self.removelbl, expand=False, fill=False, padding=10)
+            self.sctrlbox.pack_start(self.remove, expand=False, fill=False, padding=0)
             self.vbox.pack_start(self.sctrlbox, expand=False, fill=False, padding=5)
 
             # Add seperator
@@ -228,22 +249,31 @@ if importStatus:
             filename = self.filenametf.get_text()
             iter_num = self.itertf.get_text()
             is_zero = self.zero.get_active()
+            is_remove = self.remove.get_active()
             ## Check if the iteration is a digit number, if not treat as invalid iterations
             if iter_num.isdigit():
-                # Proceed shredding operations
-                target.iterations = iter_num
-                target.filename = filename
-                target.zero = is_zero
-                target.remove = False
-                target.gui = self
-                self.insertText("Target File: "+filename+"\nIterations: "+iter_num+", Zero-ing: "+str(is_zero)+"\n")
-                self.insertText("Here we go! Pray that it doesn't take anything bad out!\n")
-                # Begin shredding. Widgets disabled to prevent interruption in due process.
-                self.disable_widgets()
-                target.destroy()
-                self.enable_widgets()
-                # Finish shredding
-                self.insertText("Done with all the shredding! \nYou may proceed to exit or shred more stuff again.\n")
+                if iter_num > 0:
+                    # Proceed shredding operations
+                    target.iterations = iter_num
+                    target.filename = filename
+                    target.zero = is_zero
+                    target.remove = is_remove
+                    target.gui = self
+                    self.insertText("Target File: "+filename+"\nIterations: "+iter_num+", Zero-ing: "+str(is_zero)+", Remove: "+str(is_remove)+".\n")
+                    self.insertText("Here we go! Pray that it doesn't take anything bad out!\n")
+                    # Begin shredding. Widgets disabled to prevent interruption in due process.
+                    self.disable_widgets()
+                    target.destroy()
+                    self.enable_widgets()
+                    self.filenametf.set_text("")
+                    # Finish shredding
+                    self.insertText("Done with all the shredding! \nYou may proceed to exit or shred more stuff again.\n==========\n")
+                else:
+                    iter_warn_msg = "Iteration field only accepts positive integer numbers.\nPlease try again."
+                    self.dialog = gtk.MessageDialog(None, gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_WARNING, gtk.BUTTONS_CLOSE, iter_warn_msg)
+                    self.dialog.run()
+                    self.dialog.destroy()
+                    self.itertf.set_text("100")
             else:
                 # Throws a warning dialog
                 iter_warn_msg = "Iteration field only accepts positive integer numbers.\nPlease try again."

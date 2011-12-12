@@ -34,6 +34,13 @@ class shreddable():
             command += " -z"
     
         command += " '{}' \;"
+
+        ## Check if GUI parameter is passed over. If GUI parameter is found, proceed to divert output to GUI output.
+        if (self.gui != None):
+
+           # Displays on the GUI output console the files that are being shredded at the moment
+           self.gui.insertText("Shredding: "+self.filename+"\n")
+
         os.system(command)
 
         if (self.remove == True):
@@ -47,7 +54,7 @@ class shreddable():
             if (self.gui != None):
 
                 # Displays on the GUI output console the files that are being shredded at the moment
-                self.gui.insertText("Warning! - "+self.filename+" does NOT EXIST! An implementation bug on the filename section has occurred !\n")
+                self.gui.insertText("Warning! - "+self.filename+" does NOT EXIST! Please re-select a valid file.\n")
             else:
                 sys.exit("ERROR: filename does not exist-developers-check implementation of filename section")
 
