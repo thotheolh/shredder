@@ -28,6 +28,7 @@ if importStatus:
         filenametf = None
         chooser = None
         dnd_list = [ ( 'text/uri-list', 0, 80 ) ]
+        cwd = os.getcwd()
 
         def __init__(self):
             print "Starting GTK Interface"
@@ -60,24 +61,24 @@ if importStatus:
 
             # Shred button
             self.shredimg = gtk.Image()
-            self.shredimg.set_from_file("img/shred.png")
+            self.shredimg.set_from_file(get_resource("img/shred.png"))
             self.shredbtn.add(self.shredimg)
             
             # File chooser button
             self.fileimg = gtk.Image()
-            self.fileimg.set_from_file("img/file.png")
+            self.fileimg.set_from_file(get_resource("img/file.png"))
             self.filechoosebtn.add(self.fileimg)
 
             # Folder chooser button
 
             self.folderimg = gtk.Image()
-            self.folderimg.set_from_file("img/folder.png")
+            self.folderimg.set_from_file(get_resource("img/folder.png"))
             self.folderchoosebtn.add(self.folderimg)
 
             # Trash button
 
             self.trashimg = gtk.Image()
-            self.trashimg.set_from_file("img/trash.png")
+            self.trashimg.set_from_file(get_resource("img/trash.png"))
             self.trashbtn.add(self.trashimg)
 
             ## Check Boxes
@@ -182,8 +183,7 @@ if importStatus:
 
             ## Presenting window
             self.window.add(self.vbox)
-            self.window.show_all()      
-            # self.insertText("helloworld")
+            self.window.show_all()
             gtk.main()
             return None
 
@@ -311,3 +311,9 @@ if importStatus:
         path = urllib.url2pathname(path) # escape special chars
         path = path.strip('\r\n\x00') # remove \r\n and NULL
         return path
+
+    def get_resource(rel_path):
+        dir_of_py_file = os.path.dirname(__file__)
+        rel_path_to_resource = os.path.join(dir_of_py_file, rel_path)
+        abs_path_to_resource = os.path.abspath(rel_path_to_resource)
+        return abs_path_to_resource
