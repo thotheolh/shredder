@@ -37,7 +37,7 @@ if importStatus:
         def startGUI(self):
             print "GUI Started"
             self.window = gtk.Window(gtk.WINDOW_TOPLEVEL)
-            self.window.set_title("Shredder - v0.1 (Beta2)")
+            self.window.set_title("Shredder - v0.1 (Beta)")
             self.window.set_border_width(10)
             self.window.connect("destroy", self.destroy)
 
@@ -95,7 +95,7 @@ if importStatus:
                   self.dnd_list, gtk.gdk.ACTION_COPY)
             self.itertf = gtk.Entry(max=0)
             self.itertf.set_width_chars(8)
-            self.itertf.set_text("5")
+            self.itertf.set_text("100")
 
             ## Text View with frame wrapping
             self.page_size = gtk.Adjustment(lower=100, page_size=100)
