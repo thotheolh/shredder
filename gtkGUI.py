@@ -40,6 +40,7 @@ if importStatus:
             self.window.set_title("Shredder - v0.1 (Beta2)")
             self.window.set_border_width(10)
             self.window.connect("destroy", self.destroy)
+            self.window.set_icon_from_file(get_resource("img/shredder.svg"))
 
             ## Labels
             self.filelbl = gtk.Label("File / Folder: ")
