@@ -25,7 +25,7 @@ class UI(Gtk.Window):
 		self.menuxml = """
 		<ui>
 		<menubar name='MenuBar'>
-			<menu action='FileMenu'>
+			<menu action='File'>
 				<menuitem action='FileQuit' />
 			</menu>
 		</menubar>
@@ -35,7 +35,7 @@ class UI(Gtk.Window):
 		self.menumanager = Gtk.UIManager()
 		self.menumanager.add_ui_from_string(self.menuxml)
 		self.menumanager.insert_action_group(self.actions)
-		self.action_file = Gtk.Action("FileMenu", "File", None, None)
+		self.action_file = Gtk.Action("File", "File", None, None)
 		self.action_file_quit = Gtk.Action("FileQuit", None, None, Gtk.STOCK_QUIT)
 		self.action_file_quit.connect("activate", self.on_quit)
 		self.actions.add_action(self.action_file)
@@ -134,9 +134,14 @@ class UI(Gtk.Window):
 	def shred_all(self, button):
 		for items in self.shred_list:
 			items.destroy()
-
-	def insertText(output, padding):
+			self.sidelist_model.clear()
+			self.trash.set_sensitive(True)
+	
+	#output text
+	def insertText(padding, output):
 		print(output)
+		
+	
 
 	
 		
