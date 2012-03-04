@@ -3,22 +3,24 @@ import sys
 
 class shreddable():
 
-#Variables-------------------------------------------
-    filename = ""
-    directory = False
-    iterations = 3
-    zero = False
-    remove = False
-    gui = None
+#Constructor-------------------------------------------
+    
+    def __init__(self, filename, iterations, zero, remove, gui):
+		self.filename = filename
+		self.iterations = iterations
+		self.zero = zero
+		self.remove = remove
+		self.gui = gui
+		
 
 #Member functions-------------------------------------
-    def shred(self):
+    def shred(self, filename):
         command = "shred " + "-n" + str(self.iterations)
         if (self.zero == True):
             command += " -z"
         if (self.remove == True):
             command += " -u"
-        command += " \"" + self.filename + "\""
+        command += " \"" + filename + "\""
 
         ## Check if GUI parameter is passed over. If GUI parameter is found, proceed to divert output to GUI output.
         if (self.gui != None):
@@ -29,23 +31,12 @@ class shreddable():
         os.system(command)
 
     def rshred(self):
-        command = "find \"" + self.filename + "\" -type f -exec shred -n" + str(self.iterations)
-        if (self.zero == True):
-            command += " -z"
-    
-        command += " '{}' \;"
-
-        ## Check if GUI parameter is passed over. If GUI parameter is found, proceed to divert output to GUI output.
-        if (self.gui != None):
-
-           # Displays on the GUI output console the files that are being shredded at the moment
-           self.gui.insertText("Shredding: "+self.filename+"\n")
-
-        os.system(command)
-
-        if (self.remove == True):
-            removedir = "rm -r \"" + self.filename + "\""
-            os.system(removedir)
+		for dirname, dirnames, filenames in os.walk(self.filename):
+			for filename in filenames:
+				self.shred(os.path.join(dirname, filename))
+				
+	
+	
 
     def destroy(self):
         if (os.path.exists(self.filename) != True):
@@ -62,7 +53,7 @@ class shreddable():
             self.rshred()
 
         else:
-            self.shred()
+            self.shred(self.filename)
 
 
 
