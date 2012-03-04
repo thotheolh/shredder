@@ -10,6 +10,7 @@ class UI(Gtk.Window):
 		
 		#a few necessary variables
 		self.filenames = []
+		self.shred_list = []
 		
 		#setup the window
 		self.set_default_size(600, 400)
@@ -115,23 +116,27 @@ class UI(Gtk.Window):
 	
 	#add a generic item to the list
 	def sidelist_add_item(self, shredinst):
+		self.shred_list.append(shredinst)
 		itemstring = shredinst.filename
 		self.sidelist_model.append(row = [itemstring])
-		self.filenames += itemstring
+		self.filenames.append(itemstring)
 			
 	#add a trash entry to the list
 	def sidelist_add_trash(self, button):
 		home = os.getenv("HOME")
-		trash = home + ".local/share/Trash/files"
-		trashshred = shreddable()
+		trash = home + "/.local/share/Trash/files"
+		trashshred = shreddable(trash, self.iterations.get_value(), False, False, self)
 		trashshred.filename = trash
 		self.sidelist_add_item(trashshred)
 		self.trash.set_sensitive(False)
 		
 	#shred!
 	def shred_all(self, button):
-		print(self.filenames)
+		for items in self.shred_list:
+			items.destroy()
 
+	def insertText(output, padding):
+		print(output)
 
 	
 		
