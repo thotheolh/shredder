@@ -28,6 +28,9 @@ class UI(Gtk.Window):
 			<menu action='File'>
 				<menuitem action='FileQuit' />
 			</menu>
+			<menu action='Help'>
+				<menuitem action='HelpAbout' />
+			</menu>
 		</menubar>
 		</ui>
 		"""
@@ -36,10 +39,15 @@ class UI(Gtk.Window):
 		self.menumanager.add_ui_from_string(self.menuxml)
 		self.menumanager.insert_action_group(self.actions)
 		self.action_file = Gtk.Action("File", "File", None, None)
+		self.action_help = Gtk.Action("Help", "Help", None, None)
 		self.action_file_quit = Gtk.Action("FileQuit", None, None, Gtk.STOCK_QUIT)
+		self.action_help_about = Gtk.Action("HelpAbout", None, None, Gtk.STOCK_ABOUT)
 		self.action_file_quit.connect("activate", self.on_quit)
+		self.action_help_about.connect("activate", self.on_help)
 		self.actions.add_action(self.action_file)
+		self.actions.add_action(self.action_help)
 		self.actions.add_action(self.action_file_quit)
+		self.actions.add_action(self.action_help_about)
 		self.menu = self.menumanager.get_widget("/MenuBar")
 		
 		
@@ -113,6 +121,10 @@ class UI(Gtk.Window):
 	#on quitting...
 	def on_quit(self, padding):
 		Gtk.main_quit()
+		
+	#on about
+	def on_help(self, padding):
+		aboutwin = About()
 	
 	#add a generic item to the list
 	def sidelist_add_item(self, shredinst):
@@ -140,6 +152,15 @@ class UI(Gtk.Window):
 	#output text
 	def insertText(padding, output):
 		print(output)
+		
+class About(Gtk.AboutDialog):
+	def __init__(self):
+		super(Gtk.AboutDialog, self).__init__()
+		self.set_program_name("Shredder")
+		self.set_website("http://code.google.com/p/shredder")
+		self.set_authors([ "Tay Thotheolh <twzgerald@gmail.com>", "Michael Rawson <michaelrawson76@gmail.com>"])
+		self.show_all()
+		
 		
 	
 
