@@ -1,8 +1,27 @@
 #!/usr/bin/env python
 import sys, urllib, os
-from gi.repository import Gtk #gtk 3(!) library.
+from gi.repository import Gtk, Gdk #gtk 3(!) library.
 
 from shreddable import shreddable #shreddable class
+
+license = """
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+"""
+
+version_file = open('version', 'r')
+version = version_file.read()
 
 class UI(Gtk.Window):
 	def __init__(self): #constructor
@@ -66,6 +85,8 @@ class UI(Gtk.Window):
 		#A place for drag and drop, currently not functional (Tay fix!)
 		self.dnd_area = Gtk.Label()
 		self.dnd_area.set_label("Drag files here to add them")
+		self.dnd_area.drag_dest_set(Gtk.DestDefaults.ALL, [], Gdk.DragAction.COPY)
+		self.dnd_area.connect("drag-data-received", self.on_drag_data)
 		
 		#a Gtk.SpinButton for the number of iterations
 		self.iterations = Gtk.SpinButton()
@@ -100,6 +121,15 @@ class UI(Gtk.Window):
 		self.leftbox = Gtk.Box(orientation = Gtk.Orientation.VERTICAL)
 		self.leftbox.pack_start(self.sidelist, True, True, 0)
 		
+		
+		#An About Dialog, where the developers get to show off.
+		self.about_dialog = Gtk.AboutDialog()
+		self.about_dialog.set_program_name("Shredder")
+		self.about_dialog.set_website("http://code.google.com/p/shredder")
+		self.about_dialog.set_license(license)
+		self.about_dialog.set_authors([ "Tay Thotheolh <twzgerald@gmail.com>", "Michael Rawson <michaelrawson76@gmail.com>"])
+		self.about_dialog.set_version(version)
+		
 		#the main box for the window
 		self.mainbox = Gtk.Box()
 		self.mainbox.set_orientation(Gtk.Orientation.HORIZONTAL)
@@ -124,7 +154,8 @@ class UI(Gtk.Window):
 		
 	#on about
 	def on_help(self, padding):
-		aboutwin = About()
+		self.about_dialog.run()
+		self.about_dialog.hide()
 	
 	#add a generic item to the list
 	def sidelist_add_item(self, shredinst):
@@ -148,19 +179,15 @@ class UI(Gtk.Window):
 			items.destroy()
 			self.sidelist_model.clear()
 			self.trash.set_sensitive(True)
+			
+			
+	def on_drag_data(self, widget, drag_context, x, y, data, info, time):
+		print("Something dropped")
+		
 	
 	#output text
 	def insertText(padding, output):
 		print(output)
-		
-class About(Gtk.AboutDialog):
-	def __init__(self):
-		super(Gtk.AboutDialog, self).__init__()
-		self.set_program_name("Shredder")
-		self.set_website("http://code.google.com/p/shredder")
-		self.set_authors([ "Tay Thotheolh <twzgerald@gmail.com>", "Michael Rawson <michaelrawson76@gmail.com>"])
-		self.show_all()
-		
 		
 	
 
