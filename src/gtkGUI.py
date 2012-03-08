@@ -30,6 +30,7 @@ class UI(Gtk.Window):
 		#a few necessary variables
 		self.filenames = []
 		self.shred_list = []
+		self.dialog_response = Gtk.ResponseType.CANCEL
 		
 		#setup the window
 		self.set_default_size(600, 400)
@@ -45,10 +46,12 @@ class UI(Gtk.Window):
 		<ui>
 		<menubar name='MenuBar'>
 			<menu action='File'>
-				<menuitem action='FileQuit' />
+				<menuitem action = 'FileQuit' />
+				<menuitem action = 'FileFile' />
+				<menuitem action = 'FileFolder' />
 			</menu>
 			<menu action='Help'>
-				<menuitem action='HelpAbout' />
+				<menuitem action ='HelpAbout' />
 			</menu>
 		</menubar>
 		</ui>
@@ -59,13 +62,19 @@ class UI(Gtk.Window):
 		self.menumanager.insert_action_group(self.actions)
 		self.action_file = Gtk.Action("File", "File", None, None)
 		self.action_help = Gtk.Action("Help", "Help", None, None)
-		self.action_file_quit = Gtk.Action("FileQuit", None, None, Gtk.STOCK_QUIT)
+		self.action_file_quit = Gtk.Action("FileQuit", "Quit", None, None)
+		self.action_file_file = Gtk.Action("FileFile", "Open a file", None, None)
+		self.action_file_folder = Gtk.Action("FileFolder", "Open a folder", None, None)
 		self.action_help_about = Gtk.Action("HelpAbout", None, None, Gtk.STOCK_ABOUT)
 		self.action_file_quit.connect("activate", self.on_quit)
+		self.action_file_file.connect("activate", self.on_open_file)
+		self.action_file_folder.connect("activate", self.on_open_folder)
 		self.action_help_about.connect("activate", self.on_help)
 		self.actions.add_action(self.action_file)
 		self.actions.add_action(self.action_help)
 		self.actions.add_action(self.action_file_quit)
+		self.actions.add_action(self.action_file_file)
+		self.actions.add_action(self.action_file_folder)
 		self.actions.add_action(self.action_help_about)
 		self.menu = self.menumanager.get_widget("/MenuBar")
 		
@@ -152,6 +161,28 @@ class UI(Gtk.Window):
 	def on_quit(self, padding):
 		Gtk.main_quit()
 		
+	#on opening file
+	def on_open_file(self, padding):
+		dialog = Gtk.FileChooserDialog("Open a file for shredding", self, Gtk.FileChooserAction.OPEN, (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
+		
+		response = dialog.run()
+        
+		if response == Gtk.ResponseType.OK:
+			self.sidelist_add_item(shreddable(dialog.get_filename(), self.iterations.get_value(), False, False, self))
+			
+		dialog.destroy()
+		
+	#on opening folder
+	def on_open_folder(self, padding):
+		
+		dialog = Gtk.FileChooserDialog("Open a folder for shredding", self, Gtk.FileChooserAction.SELECT_FOLDER, (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
+		response = dialog.run()
+        
+		if response == Gtk.ResponseType.OK:
+			self.sidelist_add_item(shreddable(dialog.get_filename(), self.iterations.get_value(), False, False, self))
+			
+		dialog.destroy()
+
 	#on about
 	def on_help(self, padding):
 		self.about_dialog.run()
