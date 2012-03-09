@@ -31,7 +31,23 @@ class UI(Gtk.Window):
 		self.shred_list = []
 		self.dialog_response = Gtk.ResponseType.CANCEL
 		
-		#setup the window
+		#preferences dialog stuff
+		self.iterations = Gtk.SpinButton()
+		self.iterations.set_adjustment(Gtk.Adjustment(0, 1, 20, 1, 10, 0))
+		
+		self.check_remove = Gtk.CheckButton(label="Remove files when shredded")
+		
+		self.check_zero = Gtk.CheckButton(label="Write files over with zeros")
+		
+		self.pref_close = Gtk.Button(stock=Gtk.STOCK_CLOSE)
+		self.pref_close.connect("clicked", self.on_pref_quit)
+		
+		self.pref_vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+		self.pref_vbox.pack_start(self.check_remove, False, False, 0)
+		self.pref_vbox.pack_start(self.check_zero, False, False, 0)
+		self.pref_vbox.pack_start(self.iterations, False, False, 0)
+		
+		#setup the main window
 		self.set_default_size(600, 400)
 		self.set_title("shredder")
 		self.connect("destroy", self.on_quit)
@@ -49,32 +65,44 @@ class UI(Gtk.Window):
 				<menuitem action = 'FileFile' />
 				<menuitem action = 'FileFolder' />
 			</menu>
+			<menu action='Edit'>
+				<menuitem action = 'EditPref' />
+			</menu>
 			<menu action='Help'>
 				<menuitem action ='HelpAbout' />
 			</menu>
 		</menubar>
 		</ui>
 		"""
-		
 		self.menumanager = Gtk.UIManager()
 		self.menumanager.add_ui_from_string(self.menuxml)
 		self.menumanager.insert_action_group(self.actions)
+		
 		self.action_file = Gtk.Action("File", "File", None, None)
+		self.action_edit = Gtk.Action("Edit", "Edit", None, None)
 		self.action_help = Gtk.Action("Help", "Help", None, None)
 		self.action_file_quit = Gtk.Action("FileQuit", "Quit", None, None)
 		self.action_file_file = Gtk.Action("FileFile", "Open a file", None, None)
 		self.action_file_folder = Gtk.Action("FileFolder", "Open a folder", None, None)
+		self.action_edit_pref = Gtk.Action("EditPref", None, None, Gtk.STOCK_PREFERENCES)
 		self.action_help_about = Gtk.Action("HelpAbout", None, None, Gtk.STOCK_ABOUT)
+		
 		self.action_file_quit.connect("activate", self.on_quit)
 		self.action_file_file.connect("activate", self.on_open_file)
 		self.action_file_folder.connect("activate", self.on_open_folder)
+		self.action_edit_pref.connect("activate", self.on_open_pref)
 		self.action_help_about.connect("activate", self.on_help)
+		
 		self.actions.add_action(self.action_file)
 		self.actions.add_action(self.action_help)
 		self.actions.add_action(self.action_file_quit)
 		self.actions.add_action(self.action_file_file)
 		self.actions.add_action(self.action_file_folder)
+		self.actions.add_action(self.action_edit)
+		self.actions.add_action(self.action_edit_pref)
 		self.actions.add_action(self.action_help_about)
+		
+		#The menu
 		self.menu = self.menumanager.get_widget("/MenuBar")
 		
 		
@@ -96,29 +124,18 @@ class UI(Gtk.Window):
 		self.dnd_area.drag_dest_set(Gtk.DestDefaults.ALL, [], Gdk.DragAction.COPY)
 		self.dnd_area.connect("drag-data-received", self.on_drag_data)
 		
-		#a Gtk.SpinButton for the number of iterations
-		self.iterations = Gtk.SpinButton()
-		self.iterations.set_adjustment(Gtk.Adjustment(0, 1, 20, 1, 10, 0))
-		self.iterations_label = Gtk.Label("Severity")
-		
 		#A Button to shred everything
 		self.shred = Gtk.Button("Shred files")
 		self.shred.connect("clicked", self.shred_all)
-		
-		#A Button to close
-		self.close = Gtk.Button(stock=Gtk.STOCK_CLOSE)
-		self.close.connect("clicked", Gtk.main_quit)
-		
+	
 		#A Button to add trash
 		self.trash = Gtk.Button("Add Trash")
 		self.trash.connect("clicked", self.sidelist_add_trash)
 		
-		#A Gtk.Grid to hold three buttons and a spinnerbutton
-		self.controlpanel = Gtk.Grid()
-		self.controlpanel.attach(self.iterations, 0, 0, 1, 1)
-		self.controlpanel.attach(self.shred, 1, 0, 1, 1)
-		self.controlpanel.attach(self.trash, 0, 1, 1, 1)
-		self.controlpanel.attach(self.close, 1, 1, 1, 1)
+		#A Gtk.Button to hold necessary buttons
+		self.controlpanel = Gtk.Box(orientation = Gtk.Orientation.HORIZONTAL)
+		self.controlpanel.pack_end(self.shred, False, False, 0)
+		self.controlpanel.pack_end(self.trash, False, False, 0)
 		
 		#A Gtk.Box to hold the controlpanel and dnd_area
 		self.rightbox = Gtk.Box(orientation = Gtk.Orientation.VERTICAL)
@@ -171,6 +188,9 @@ class UI(Gtk.Window):
 	def on_quit(self, padding):
 		Gtk.main_quit()
 		
+	def on_pref_quit(self, padding):
+		self.pref_window.destroy()
+		
 	#on opening file
 	def on_open_file(self, padding):
 		dialog = Gtk.FileChooserDialog("Open a file for shredding", self, Gtk.FileChooserAction.OPEN, (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
@@ -178,7 +198,7 @@ class UI(Gtk.Window):
 		response = dialog.run()
         
 		if response == Gtk.ResponseType.OK:
-			self.sidelist_add_item(shreddable(dialog.get_filename(), self.iterations.get_value(), False, False, self))
+			self.sidelist_add_item(shreddable(dialog.get_filename(), self.iterations.get_value(), self.check_zero.get_active(), self.check_remove.get_active(), self))
 			
 		dialog.destroy()
 		
@@ -189,9 +209,18 @@ class UI(Gtk.Window):
 		response = dialog.run()
         
 		if response == Gtk.ResponseType.OK:
-			self.sidelist_add_item(shreddable(dialog.get_filename(), self.iterations.get_value(), False, False, self))
+			self.sidelist_add_item(shreddable(dialog.get_filename(), self.iterations.get_value(), self.check_zero.get_active(), self.check_remove.get_active(), self))
 			
 		dialog.destroy()
+		
+	#on preferences
+	def on_open_pref(self, padding):
+		self.pref_window = Gtk.Window()
+		self.pref_window.set_default_size(250, 300)
+		self.pref_window.set_title("Preferences")
+		self.pref_window.connect("destroy", self.on_pref_quit)
+		self.pref_window.add(self.pref_vbox)
+		self.pref_window.show_all()
 
 	#on about
 	def on_help(self, padding):
