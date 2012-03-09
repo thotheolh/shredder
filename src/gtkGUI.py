@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import sys, urllib, os
+import sys, urllib, os, time
 from gi.repository import Gtk, Gdk #gtk 3(!) library.
 
 from shreddable import shreddable #shreddable class
@@ -20,8 +20,7 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
-version_file = open('version', 'r')
-version = version_file.read()
+version = "1.4 Pre-Alpha"
 
 class UI(Gtk.Window):
 	def __init__(self): #constructor
@@ -132,12 +131,21 @@ class UI(Gtk.Window):
 		
 		
 		#An About Dialog, where the developers get to show off.
+		#If you're a contributor, please add yourself here.
 		self.about_dialog = Gtk.AboutDialog()
 		self.about_dialog.set_program_name("Shredder")
 		self.about_dialog.set_website("http://code.google.com/p/shredder")
 		self.about_dialog.set_license(license)
 		self.about_dialog.set_authors([ "Tay Thotheolh <twzgerald@gmail.com>", "Michael Rawson <michaelrawson76@gmail.com>"])
 		self.about_dialog.set_version(version)
+		
+		#A progress bar, for showing the shredded-ness.
+		self.progress = Gtk.ProgressBar()
+		self.progress.set_text("Idle")
+		
+		#A status bar for user information
+		self.status = Gtk.Statusbar()
+		self.status.push(0, "Idle")
 		
 		#the main box for the window
 		self.mainbox = Gtk.Box()
@@ -152,6 +160,8 @@ class UI(Gtk.Window):
 		self.masterbox.set_orientation(Gtk.Orientation.VERTICAL)
 		self.masterbox.pack_start(self.menu, False, False, 0)
 		self.masterbox.pack_start(self.mainbox, True, True, 0)
+		self.masterbox.pack_start(self.progress, False, False, 0)
+		self.masterbox.pack_start(self.status, False, False, 0)
 		
 		self.add(self.masterbox)
 		self.show_all()
@@ -206,10 +216,17 @@ class UI(Gtk.Window):
 		
 	#shred!
 	def shred_all(self, button):
+		self.progress.set_fraction(0)
 		for items in self.shred_list:
 			items.destroy()
-			self.sidelist_model.clear()
-			self.trash.set_sensitive(True)
+			self.filenames.remove(items.filename)
+			
+		self.sidelist_model.clear()
+		self.trash.set_sensitive(True)
+		self.filenames = []
+		self.shred_list = []
+		self.progress.set_fraction(0)
+		self.status.push(0, "Idle")
 			
 			
 	def on_drag_data(self, widget, drag_context, x, y, data, info, time):
@@ -217,8 +234,14 @@ class UI(Gtk.Window):
 		
 	
 	#output text
-	def insertText(padding, output):
-		print(output)
+	def insertText(self, output):
+		self.progress.pulse()
+		self.status.push(01, output)
+		
+		#nasty hack to give the thread control back to Gtk temporarily so the interface doesn't freeze while
+		#processing the files. TODO: better threading control.
+		while Gtk.events_pending():
+			Gtk.main_iteration()
 		
 	
 
