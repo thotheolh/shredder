@@ -29,23 +29,10 @@ class UI(Gtk.Window):
 		#a few necessary variables
 		self.filenames = []
 		self.shred_list = []
+		self.iterations = 1
+		self.remove = False
+		self.zero = False
 		self.dialog_response = Gtk.ResponseType.CANCEL
-		
-		#preferences dialog stuff
-		self.iterations = Gtk.SpinButton()
-		self.iterations.set_adjustment(Gtk.Adjustment(0, 1, 20, 1, 10, 0))
-		
-		self.check_remove = Gtk.CheckButton(label="Remove files when shredded")
-		
-		self.check_zero = Gtk.CheckButton(label="Write files over with zeros")
-		
-		self.pref_close = Gtk.Button(stock=Gtk.STOCK_CLOSE)
-		self.pref_close.connect("clicked", self.on_pref_quit)
-		
-		self.pref_vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-		self.pref_vbox.pack_start(self.check_remove, False, False, 0)
-		self.pref_vbox.pack_start(self.check_zero, False, False, 0)
-		self.pref_vbox.pack_start(self.iterations, False, False, 0)
 		
 		#setup the main window
 		self.set_default_size(600, 400)
@@ -64,7 +51,6 @@ class UI(Gtk.Window):
 				<menuitem action = 'FileQuit' />
 				<menuitem action = 'FileFile' />
 				<menuitem action = 'FileFolder' />
-				<menuitem action = 'FileTrash' />
 			</menu>
 			<menu action='Edit'>
 				<menuitem action = 'EditPref' />
@@ -84,7 +70,6 @@ class UI(Gtk.Window):
 		self.action_help = Gtk.Action("Help", "Help", None, None)
 		self.action_file_quit = Gtk.Action("FileQuit", "Quit", None, None)
 		self.action_file_file = Gtk.Action("FileFile", "Open a file", None, None)
-		self.action_file_trash = Gtk.Action("FileTrash", "Open trash", None, None)
 		self.action_file_folder = Gtk.Action("FileFolder", "Open a folder", None, None)
 		self.action_edit_pref = Gtk.Action("EditPref", None, None, Gtk.STOCK_PREFERENCES)
 		self.action_help_about = Gtk.Action("HelpAbout", None, None, Gtk.STOCK_ABOUT)
@@ -92,7 +77,6 @@ class UI(Gtk.Window):
 		self.action_file_quit.connect("activate", self.on_quit)
 		self.action_file_file.connect("activate", self.on_open_file)
 		self.action_file_folder.connect("activate", self.on_open_folder)
-		self.action_file_trash.connect("activate", self.sidelist_add_trash)
 		self.action_edit_pref.connect("activate", self.on_open_pref)
 		self.action_help_about.connect("activate", self.on_help)
 		
@@ -101,7 +85,6 @@ class UI(Gtk.Window):
 		self.actions.add_action(self.action_file_quit)
 		self.actions.add_action(self.action_file_file)
 		self.actions.add_action(self.action_file_folder)
-		self.actions.add_action(self.action_file_trash)
 		self.actions.add_action(self.action_edit)
 		self.actions.add_action(self.action_edit_pref)
 		self.actions.add_action(self.action_help_about)
@@ -193,6 +176,9 @@ class UI(Gtk.Window):
 		Gtk.main_quit()
 		
 	def on_pref_quit(self, padding):
+		self.iterations = self.check_iterations.get_value()
+		self.remove = self.check_remove.get_active()
+		self.zero = self.check_zero.get_active()
 		self.pref_window.destroy()
 		
 	#on opening file
@@ -202,7 +188,7 @@ class UI(Gtk.Window):
 		response = dialog.run()
         
 		if response == Gtk.ResponseType.OK:
-			self.sidelist_add_item(shreddable(dialog.get_filename(), self.iterations.get_value(), self.check_zero.get_active(), self.check_remove.get_active(), self))
+			self.sidelist_add_item(shreddable(dialog.get_filename(), self.iterations, self.zero, self.remove, self))
 			
 		dialog.destroy()
 		
@@ -213,12 +199,28 @@ class UI(Gtk.Window):
 		response = dialog.run()
         
 		if response == Gtk.ResponseType.OK:
-			self.sidelist_add_item(shreddable(dialog.get_filename(), self.iterations.get_value(), self.check_zero.get_active(), self.check_remove.get_active(), self))
+			self.sidelist_add_item(shreddable(dialog.get_filename(), self.iterations, self.zero, self.remove, self))
 			
 		dialog.destroy()
 		
 	#on preferences
 	def on_open_pref(self, padding):
+		self.check_iterations = Gtk.SpinButton()
+		self.check_iterations.set_adjustment(Gtk.Adjustment(self.iterations, 1, 20, 1, 10, 0))
+		
+		self.check_remove = Gtk.CheckButton(label="Remove files when shredded")
+		self.check_remove.set_active(self.remove)
+		
+		self.check_zero = Gtk.CheckButton(label="Write files over with zeros")
+		self.check_zero.set_active(self.zero)
+		
+		self.pref_close = Gtk.Button(stock=Gtk.STOCK_CLOSE)
+		self.pref_close.connect("clicked", self.on_pref_quit)
+		
+		self.pref_vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+		self.pref_vbox.pack_start(self.check_remove, False, False, 0)
+		self.pref_vbox.pack_start(self.check_zero, False, False, 0)
+		self.pref_vbox.pack_start(self.check_iterations, False, False, 0)
 		self.pref_window = Gtk.Window()
 		self.pref_window.set_default_size(250, 300)
 		self.pref_window.set_title("Preferences")
@@ -240,13 +242,12 @@ class UI(Gtk.Window):
 			
 	#add a trash entry to the list
 	def sidelist_add_trash(self, button):
-		if(self.trash.get_sensitive() != False):	
-			home = os.getenv("HOME")
-			trash = home + "/.local/share/Trash/files"
-			trashshred = shreddable(trash, self.iterations.get_value(), False, False, self)
-			trashshred.filename = trash
-			self.sidelist_add_item(trashshred)
-			self.trash.set_sensitive(False)
+		home = os.getenv("HOME")
+		trash = home + "/.local/share/Trash/files"
+		trashshred = shreddable(trash, self.iterations, False, False, self)
+		trashshred.filename = trash
+		self.sidelist_add_item(trashshred)
+		self.trash.set_sensitive(False)
 		
 	#shred!
 	def shred_all(self, button):
