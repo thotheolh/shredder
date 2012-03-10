@@ -64,6 +64,7 @@ class UI(Gtk.Window):
 				<menuitem action = 'FileQuit' />
 				<menuitem action = 'FileFile' />
 				<menuitem action = 'FileFolder' />
+				<menuitem action = 'FileTrash' />
 			</menu>
 			<menu action='Edit'>
 				<menuitem action = 'EditPref' />
@@ -83,6 +84,7 @@ class UI(Gtk.Window):
 		self.action_help = Gtk.Action("Help", "Help", None, None)
 		self.action_file_quit = Gtk.Action("FileQuit", "Quit", None, None)
 		self.action_file_file = Gtk.Action("FileFile", "Open a file", None, None)
+		self.action_file_trash = Gtk.Action("FileTrash", "Open trash", None, None)
 		self.action_file_folder = Gtk.Action("FileFolder", "Open a folder", None, None)
 		self.action_edit_pref = Gtk.Action("EditPref", None, None, Gtk.STOCK_PREFERENCES)
 		self.action_help_about = Gtk.Action("HelpAbout", None, None, Gtk.STOCK_ABOUT)
@@ -90,6 +92,7 @@ class UI(Gtk.Window):
 		self.action_file_quit.connect("activate", self.on_quit)
 		self.action_file_file.connect("activate", self.on_open_file)
 		self.action_file_folder.connect("activate", self.on_open_folder)
+		self.action_file_trash.connect("activate", self.sidelist_add_trash)
 		self.action_edit_pref.connect("activate", self.on_open_pref)
 		self.action_help_about.connect("activate", self.on_help)
 		
@@ -98,6 +101,7 @@ class UI(Gtk.Window):
 		self.actions.add_action(self.action_file_quit)
 		self.actions.add_action(self.action_file_file)
 		self.actions.add_action(self.action_file_folder)
+		self.actions.add_action(self.action_file_trash)
 		self.actions.add_action(self.action_edit)
 		self.actions.add_action(self.action_edit_pref)
 		self.actions.add_action(self.action_help_about)
@@ -236,12 +240,13 @@ class UI(Gtk.Window):
 			
 	#add a trash entry to the list
 	def sidelist_add_trash(self, button):
-		home = os.getenv("HOME")
-		trash = home + "/.local/share/Trash/files"
-		trashshred = shreddable(trash, self.iterations.get_value(), False, False, self)
-		trashshred.filename = trash
-		self.sidelist_add_item(trashshred)
-		self.trash.set_sensitive(False)
+		if(self.trash.get_sensitive() != False):	
+			home = os.getenv("HOME")
+			trash = home + "/.local/share/Trash/files"
+			trashshred = shreddable(trash, self.iterations.get_value(), False, False, self)
+			trashshred.filename = trash
+			self.sidelist_add_item(trashshred)
+			self.trash.set_sensitive(False)
 		
 	#shred!
 	def shred_all(self, button):
