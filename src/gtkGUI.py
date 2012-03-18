@@ -244,7 +244,7 @@ class UI(Gtk.Window):
 	def sidelist_add_trash(self, button):
 		home = os.getenv("HOME")
 		trash = home + "/.local/share/Trash/files"
-		trashshred = shreddable(trash, self.iterations, False, False, self)
+		trashshred = shreddable(trash, self.iterations, self.zero, self.remove, self)
 		trashshred.filename = trash
 		self.sidelist_add_item(trashshred)
 		self.trash.set_sensitive(False)
