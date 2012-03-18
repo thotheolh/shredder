@@ -112,11 +112,11 @@ class UI(Gtk.Window):
 		self.dnd_area.connect("drag-data-received", self.on_drag_data)
 		
 		#A Button to shred everything
-		self.shred = Gtk.Button("Shred files")
+		self.shred = Gtk.Button("Shred Files")
 		self.shred.connect("clicked", self.shred_all)
 	
 		#A Button to add trash
-		self.trash = Gtk.Button("Add Trash")
+		self.trash = Gtk.Button("Shred Trash")
 		self.trash.connect("clicked", self.sidelist_add_trash)
 		
 		#A Gtk.Button to hold necessary buttons
