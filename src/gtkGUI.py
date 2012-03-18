@@ -48,9 +48,9 @@ class UI(Gtk.Window):
 		<ui>
 		<menubar name='MenuBar'>
 			<menu action='File'>
-				<menuitem action = 'FileQuit' />
 				<menuitem action = 'FileFile' />
 				<menuitem action = 'FileFolder' />
+				<menuitem action = 'FileQuit' />
 			</menu>
 			<menu action='Edit'>
 				<menuitem action = 'EditPref' />
@@ -68,23 +68,23 @@ class UI(Gtk.Window):
 		self.action_file = Gtk.Action("File", "File", None, None)
 		self.action_edit = Gtk.Action("Edit", "Edit", None, None)
 		self.action_help = Gtk.Action("Help", "Help", None, None)
-		self.action_file_quit = Gtk.Action("FileQuit", "Quit", None, None)
 		self.action_file_file = Gtk.Action("FileFile", "Open a file", None, None)
 		self.action_file_folder = Gtk.Action("FileFolder", "Open a folder", None, None)
+		self.action_file_quit = Gtk.Action("FileQuit", "Quit", None, None)
 		self.action_edit_pref = Gtk.Action("EditPref", None, None, Gtk.STOCK_PREFERENCES)
 		self.action_help_about = Gtk.Action("HelpAbout", None, None, Gtk.STOCK_ABOUT)
 		
-		self.action_file_quit.connect("activate", self.on_quit)
 		self.action_file_file.connect("activate", self.on_open_file)
 		self.action_file_folder.connect("activate", self.on_open_folder)
+		self.action_file_quit.connect("activate", self.on_quit)
 		self.action_edit_pref.connect("activate", self.on_open_pref)
 		self.action_help_about.connect("activate", self.on_help)
 		
 		self.actions.add_action(self.action_file)
 		self.actions.add_action(self.action_help)
-		self.actions.add_action(self.action_file_quit)
 		self.actions.add_action(self.action_file_file)
 		self.actions.add_action(self.action_file_folder)
+		self.actions.add_action(self.action_file_quit)
 		self.actions.add_action(self.action_edit)
 		self.actions.add_action(self.action_edit_pref)
 		self.actions.add_action(self.action_help_about)
