@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 import sys, os
-from gtkGUI import *
+from gtkGUI3 import *
 
 desktop_environment = 'generic'
 if os.environ.get('KDE_FULL_SESSION') == 'true':
