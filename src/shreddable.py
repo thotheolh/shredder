@@ -1,5 +1,4 @@
-import os
-import sys
+import os, sys, shutil
 
 class shreddable():
 
@@ -35,6 +34,8 @@ class shreddable():
 			for filename in filenames:
 				self.shred(os.path.join(dirname, filename))
 				
+		for dirs in os.listdir(self.filename):
+			shutil.rmtree(self.filename + "/" + dirs)
 	
 	
 
