@@ -108,7 +108,7 @@ class UI(Gtk.Window):
 		#A place for drag and drop, currently not functional (Tay fix!)
 		self.dnd_area = Gtk.Label()
 		self.dnd_area.set_label("Drag files here to add them")
-		self.dnd_area.drag_dest_set(Gtk.DestDefaults.ALL, [], Gdk.DragAction.COPY)
+		#self.dnd_area.drag_dest_set(Gtk.DestDefaults.ALL, [], Gdk.DragAction.COPY)
 		self.dnd_area.connect("drag-data-received", self.on_drag_data)
 		
 		#A Button to shred everything
@@ -120,17 +120,17 @@ class UI(Gtk.Window):
 		self.trash.connect("clicked", self.sidelist_add_trash)
 		
 		#A Gtk.Button to hold necessary buttons
-		self.controlpanel = Gtk.Box(orientation = Gtk.Orientation.HORIZONTAL)
+		self.controlpanel = Gtk.HBox(orientation = Gtk.Orientation.HORIZONTAL)
 		self.controlpanel.pack_end(self.shred, False, False, 0)
 		self.controlpanel.pack_end(self.trash, False, False, 0)
 		
 		#A Gtk.Box to hold the controlpanel and dnd_area
-		self.rightbox = Gtk.Box(orientation = Gtk.Orientation.VERTICAL)
+		self.rightbox = Gtk.VBox(orientation = Gtk.Orientation.VERTICAL)
 		self.rightbox.pack_start(self.dnd_area, True, True, 0)
 		self.rightbox.pack_start(self.controlpanel, False, False, 0)
 		
 		#A Gtk.Box to hold the sidelist and any future widgets
-		self.leftbox = Gtk.Box(orientation = Gtk.Orientation.VERTICAL)
+		self.leftbox = Gtk.VBox(orientation = Gtk.Orientation.VERTICAL)
 		self.leftbox.pack_start(self.sidelist, True, True, 0)
 		
 		
@@ -152,7 +152,7 @@ class UI(Gtk.Window):
 		self.status.push(0, "Idle")
 		
 		#the main box for the window
-		self.mainbox = Gtk.Box()
+		self.mainbox = Gtk.HBox()
 		self.mainbox.set_orientation(Gtk.Orientation.HORIZONTAL)
 		self.mainbox.pack_start(self.leftbox, True, True, 0)
 		self.mainbox.pack_start(self.rightbox, True, True, 0)
@@ -160,7 +160,7 @@ class UI(Gtk.Window):
 		
 		
 		#include mainbox and menu
-		self.masterbox = Gtk.Box()
+		self.masterbox = Gtk.VBox()
 		self.masterbox.set_orientation(Gtk.Orientation.VERTICAL)
 		self.masterbox.pack_start(self.menu, False, False, 0)
 		self.masterbox.pack_start(self.mainbox, True, True, 0)
