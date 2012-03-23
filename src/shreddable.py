@@ -27,7 +27,7 @@ class shreddable():
         if (self.gui != None):
 
            # Displays on the GUI output console the files that are being shredded at the moment
-           self.gui.insertText("Processing file "+filename+"\n")
+           self.gui.insertText(_("Processing file ")+filename+"\n")
 
         os.system(command)
 

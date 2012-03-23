@@ -1,24 +1,24 @@
 #!/usr/bin/env python
-import sys, urllib, os, time
+import sys, urllib, os, time, gettext
 from gi.repository import Gtk, Gdk #gtk 3(!) library.
 
 from shreddable import shreddable #shreddable class
 
-license = """
-This program is free software; you can redistribute it and/or
-modify it under the terms of the GNU General Public License
-as published by the Free Software Foundation; either version 2
-of the License, or (at your option) any later version.
+t = gettext.translation('shredder', 'locale', fallback=True)
+_ = t.ugettext
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-"""
+license = _("This program is free software; you can redistribute it and/or\n\
+modify it under the terms of the GNU General Public License\n\
+as published by the Free Software Foundation; either version 2\n\
+of the License, or (at your option) any later version.\n\
+This program is distributed in the hope that it will be useful,\n\
+but WITHOUT ANY WARRANTY; without even the implied warranty of\n\
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n\
+GNU General Public License for more details.\n\
+You should have received a copy of the GNU General Public License\n\
+along with this program; if not, write to the Free Software\n\
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.\n\
+")
 
 version = "1.4 Pre-Alpha"
 
@@ -36,7 +36,7 @@ class UI(Gtk.Window):
 		
 		#setup the main window
 		self.set_default_size(600, 400)
-		self.set_title("shredder")
+		self.set_title(_("shredder"))
 		self.connect("destroy", self.on_quit)
 		
 		#An action group for the menus
@@ -65,12 +65,12 @@ class UI(Gtk.Window):
 		self.menumanager.add_ui_from_string(self.menuxml)
 		self.menumanager.insert_action_group(self.actions)
 		
-		self.action_file = Gtk.Action("File", "File", None, None)
-		self.action_edit = Gtk.Action("Edit", "Edit", None, None)
-		self.action_help = Gtk.Action("Help", "Help", None, None)
-		self.action_file_file = Gtk.Action("FileFile", "Open a file", None, None)
-		self.action_file_folder = Gtk.Action("FileFolder", "Open a folder", None, None)
-		self.action_file_quit = Gtk.Action("FileQuit", "Quit", None, None)
+		self.action_file = Gtk.Action("File", _("File"), None, None)
+		self.action_edit = Gtk.Action("Edit", _("Edit"), None, None)
+		self.action_help = Gtk.Action("Help", _("Help"), None, None)
+		self.action_file_file = Gtk.Action("FileFile", _("Open a file"), None, None)
+		self.action_file_folder = Gtk.Action("FileFolder", _("Open a folder"), None, None)
+		self.action_file_quit = Gtk.Action("FileQuit", _("Quit"), None, None)
 		self.action_edit_pref = Gtk.Action("EditPref", None, None, Gtk.STOCK_PREFERENCES)
 		self.action_help_about = Gtk.Action("HelpAbout", None, None, Gtk.STOCK_ABOUT)
 		
@@ -97,7 +97,7 @@ class UI(Gtk.Window):
 		self.sidelist = Gtk.TreeView()
 		self.sidelist_model = Gtk.ListStore(str)
 		self.sidelist_column = Gtk.CellRendererText()
-		self.sidelist_title = Gtk.TreeViewColumn("Files")
+		self.sidelist_title = Gtk.TreeViewColumn(_("Files"))
 		
 		#setting up the TreeView
 		self.sidelist.set_model(self.sidelist_model)
@@ -107,16 +107,16 @@ class UI(Gtk.Window):
 			
 		#A place for drag and drop, currently not functional (Tay fix!)
 		self.dnd_area = Gtk.Label()
-		self.dnd_area.set_label("Drag files here to add them")
+		self.dnd_area.set_label(_("Drag files here to add them"))
 		#self.dnd_area.drag_dest_set(Gtk.DestDefaults.ALL, [], Gdk.DragAction.COPY)
 		self.dnd_area.connect("drag-data-received", self.on_drag_data)
 		
 		#A Button to shred everything
-		self.shred = Gtk.Button("Shred Files")
+		self.shred = Gtk.Button(_("Shred Files"))
 		self.shred.connect("clicked", self.shred_all)
 	
 		#A Button to add trash
-		self.trash = Gtk.Button("Shred Trash")
+		self.trash = Gtk.Button(_("Shred Trash"))
 		self.trash.connect("clicked", self.sidelist_add_trash)
 		
 		#A Gtk.Button to hold necessary buttons
@@ -137,7 +137,7 @@ class UI(Gtk.Window):
 		#An About Dialog, where the developers get to show off.
 		#If you're a contributor, please add yourself here.
 		self.about_dialog = Gtk.AboutDialog()
-		self.about_dialog.set_program_name("Shredder")
+		self.about_dialog.set_program_name(_("Shredder"))
 		self.about_dialog.set_website("http://code.google.com/p/shredder")
 		self.about_dialog.set_license(license)
 		self.about_dialog.set_authors([ "Tay Thotheolh <twzgerald@gmail.com>", "Michael Rawson <michaelrawson76@gmail.com>"])
@@ -145,11 +145,11 @@ class UI(Gtk.Window):
 		
 		#A progress bar, for showing the shredded-ness.
 		self.progress = Gtk.ProgressBar()
-		self.progress.set_text("Idle")
+		self.progress.set_text(_("Idle"))
 		
 		#A status bar for user information
 		self.status = Gtk.Statusbar()
-		self.status.push(0, "Idle")
+		self.status.push(0, _("Idle"))
 		
 		#the main box for the window
 		self.mainbox = Gtk.HBox()
@@ -183,7 +183,7 @@ class UI(Gtk.Window):
 		
 	#on opening file
 	def on_open_file(self, padding):
-		dialog = Gtk.FileChooserDialog("Open a file for shredding", self, Gtk.FileChooserAction.OPEN, (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
+		dialog = Gtk.FileChooserDialog(_("Open a file for shredding"), self, Gtk.FileChooserAction.OPEN, (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
 		
 		response = dialog.run()
         
@@ -195,7 +195,7 @@ class UI(Gtk.Window):
 	#on opening folder
 	def on_open_folder(self, padding):
 		
-		dialog = Gtk.FileChooserDialog("Open a folder for shredding", self, Gtk.FileChooserAction.SELECT_FOLDER, (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
+		dialog = Gtk.FileChooserDialog(_("Open a folder for shredding"), self, Gtk.FileChooserAction.SELECT_FOLDER, (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
 		response = dialog.run()
         
 		if response == Gtk.ResponseType.OK:
@@ -208,10 +208,10 @@ class UI(Gtk.Window):
 		self.check_iterations = Gtk.SpinButton()
 		self.check_iterations.set_adjustment(Gtk.Adjustment(self.iterations, 1, 20, 1, 10, 0))
 		
-		self.check_remove = Gtk.CheckButton(label="Remove files when shredded")
+		self.check_remove = Gtk.CheckButton(label=_("Remove files when shredded"))
 		self.check_remove.set_active(self.remove)
 		
-		self.check_zero = Gtk.CheckButton(label="Write files over with zeros")
+		self.check_zero = Gtk.CheckButton(label=_("Write files over with zeros"))
 		self.check_zero.set_active(self.zero)
 		
 		self.pref_close = Gtk.Button(stock=Gtk.STOCK_CLOSE)
@@ -223,7 +223,7 @@ class UI(Gtk.Window):
 		self.pref_vbox.pack_start(self.check_iterations, False, False, 0)
 		self.pref_window = Gtk.Window()
 		self.pref_window.set_default_size(250, 300)
-		self.pref_window.set_title("Preferences")
+		self.pref_window.set_title(_("Preferences"))
 		self.pref_window.connect("destroy", self.on_pref_quit)
 		self.pref_window.add(self.pref_vbox)
 		self.pref_window.show_all()
@@ -261,7 +261,7 @@ class UI(Gtk.Window):
 		self.filenames = []
 		self.shred_list = []
 		self.progress.set_fraction(0)
-		self.status.push(0, "Idle")
+		self.status.push(0, _("Idle"))
 			
 			
 	def on_drag_data(self, widget, drag_context, x, y, data, info, time):

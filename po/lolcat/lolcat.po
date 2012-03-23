@@ -1,0 +1,132 @@
+# Messages from multiple files for translation into LOLZ example 
+# Copyright (C) 2012 Michael Rawson
+# Michael Rawson <michaelrawson76@gmail.com>, 2009.
+#
+
+msgid ""
+msgstr ""
+"Project-Id-Version: shredder 0.1.4\n"
+"Report-Msgid-Bugs-To: michaelrawson76@gmail.com\n"
+"POT-Creation-Date: 2012-03-23 16:20+0000\n"
+"PO-Revision-Date: 2012-03-23 16:20+0000\n"
+"Last-Translator: Michael Rawson <michaelrawson76@gmail.com\n"
+"Language-Team: Lolcat <michaelrawson76@gmail.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: src/gtkGUI2.py:118
+msgid "Begin Shredding Files"
+msgstr "lolz, shred ur files!"
+
+#: src/gtkGUI2.py:122
+msgid "Choose a file"
+msgstr "pickz a file"
+
+#: src/gtkGUI2.py:126
+msgid "Choose a folder"
+msgstr "pickz lotza filez"
+
+#: src/gtkGUI2.py:130
+msgid "Shred Trash bin"
+msgstr "shred ur trashes"
+
+#: src/gtkGUI2.py:134 src/gtkGUI2.py:136
+msgid "Zero files when shredding"
+msgstr "ZEROES!"
+
+#: src/gtkGUI2.py:140 src/gtkGUI2.py:142
+msgid "Remove files after shredding"
+msgstr "remove ur files-eat cheezeburgers insted"
+
+#: src/gtkGUI2.py:146
+msgid "Shredding iterations per file"
+msgstr "iterationzzzzzzz per each of ur filez"
+
+#: src/gtkGUI3.py:10
+msgid ""
+"This program is free software; you can redistribute it and/or\n"
+"modify it under the terms of the GNU General Public License\n"
+"as published by the Free Software Foundation; either version 2\n"
+"of the License, or (at your option) any later version.\n"
+"This program is distributed in the hope that it will be useful,\n"
+"but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
+"MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
+"GNU General Public License for more details.\n"
+"You should have received a copy of the GNU General Public License\n"
+"along with this program; if not, write to the Free Software\n"
+"Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, "
+"USA.\n"
+msgstr "you can whatever the **** you like with this program-it is urs to eat\n"
+
+#: src/gtkGUI3.py:39
+msgid "shredder"
+msgstr "shredder"
+
+#: src/gtkGUI3.py:68
+msgid "File"
+msgstr "der Filez"
+
+#: src/gtkGUI3.py:69
+msgid "Edit"
+msgstr "Editz"
+
+#: src/gtkGUI3.py:70
+msgid "Help"
+msgstr "Helpz!"
+
+#: src/gtkGUI3.py:71
+msgid "Open a file"
+msgstr "Open ur files."
+
+#: src/gtkGUI3.py:72
+msgid "Open a folder"
+msgstr "Open ur dirz"
+
+#: src/gtkGUI3.py:73
+msgid "Quit"
+msgstr "KILL!"
+
+#: src/gtkGUI3.py:100
+msgid "Files"
+msgstr "Filez"
+
+#: src/gtkGUI3.py:110
+msgid "Drag files here to add them"
+msgstr "Dragz and dropz timez!"
+
+#: src/gtkGUI3.py:115
+msgid "Shred Files"
+msgstr "Shred ur filez"
+
+#: src/gtkGUI3.py:119
+msgid "Shred Trash"
+msgstr "Shred ur trashes"
+
+#: src/gtkGUI3.py:140
+msgid "Shredder"
+msgstr "Shredder"
+
+#: src/gtkGUI3.py:148 src/gtkGUI3.py:152 src/gtkGUI3.py:264
+msgid "Idle"
+msgstr "Iz bored"
+
+#: src/gtkGUI3.py:186
+msgid "Open a file for shredding"
+msgstr "Open ur filez for shredding"
+
+#: src/gtkGUI3.py:198
+msgid "Open a folder for shredding"
+msgstr "Open lotza filez at wunce for shredding"
+
+#: src/gtkGUI3.py:211
+msgid "Remove files when shredded"
+msgstr "Remove ur files when I'm done"
+
+#: src/gtkGUI3.py:214
+msgid "Write files over with zeros"
+msgstr "ZEROES!"
+
+#: src/gtkGUI3.py:226
+msgid "Preferences"
+msgstr "Choose ur poison"

@@ -1,0 +1,9 @@
+Hi, kindly people who wish to translate our miserable application.
+
+All you have to do is to make a new directory for your language you wish to translate, in po/, then copy po/shredder.pot into your new folder. Then translate, and use msgfmt in the usual way to produce a .mo file to be copied into the locale/ folder.
+
+References: 
+-http://www.doughellmann.com/PyMOTW/gettext/
+-The pre-made LOLCAT translation in the po/ and locale folders.
+
+Thanks for your work. :D

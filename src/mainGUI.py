@@ -4,10 +4,10 @@ import sys, os
 
 #!/usr/bin/env python
 
-#Oi Tay-this is your own code! Don't expect me to touch much of this stuff-it looks too weird for me. :P
+##TODO after impromptu meeting: make this cleaner, separate branches for the various toolkits
 
 from subprocess import *
-from gtk3GUI import *
+from gtkGUI3 import *
 
 desktop_environment = 'generic'
 if os.environ.get('KDE_FULL_SESSION') == 'true':

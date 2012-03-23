@@ -14,3 +14,5 @@ install: make
 	cp data/shredder.1.gz $(DESTDIR)/usr/share/man/man1/
 	mkdir -p $(DESTDIR)/usr/share/applications/
 	cp data/shredder.desktop $(DESTDIR)/usr/share/applications/
+	mkdir -p $(DESTDIR)/usr/share/pyshared/shredder/locale
+	cp -r locale/* $(DESTDIR)/usr/share/pyshared/shredder/locale/

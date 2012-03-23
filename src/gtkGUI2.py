@@ -115,35 +115,35 @@ if importStatus:
 
             # Shred button
             self.shredtooltip = gtk.Tooltips()
-            self.shredtooltip.set_tip(self.shredbtn, "Begin Shredding Files")
+            self.shredtooltip.set_tip(self.shredbtn, _("Begin Shredding Files"))
 
             # File choose button
             self.filetooltip = gtk.Tooltips()
-            self.filetooltip.set_tip(self.filechoosebtn, "Choose a file")
+            self.filetooltip.set_tip(self.filechoosebtn, _("Choose a file"))
 
             # Folder choose button
             self.foldertooltip = gtk.Tooltips()
-            self.foldertooltip.set_tip(self.folderchoosebtn, "Choose a folder")
+            self.foldertooltip.set_tip(self.folderchoosebtn, _("Choose a folder"))
 
             # Trash button
             self.trashtooltip = gtk.Tooltips()
-            self.trashtooltip.set_tip(self.trashbtn, "Shred Trash bin")
+            self.trashtooltip.set_tip(self.trashbtn, _("Shred Trash bin"))
 
             # Zero-ing checkbox
             self.zerotooltip = gtk.Tooltips()
-            self.zerotooltip.set_tip(self.zero, "Zero files when shredding")
+            self.zerotooltip.set_tip(self.zero, _("Zero files when shredding"))
             self.zerolbltooltip = gtk.Tooltips()
-            self.zerolbltooltip.set_tip(self.zerolbl, "Zero files when shredding")
+            self.zerolbltooltip.set_tip(self.zerolbl, _("Zero files when shredding"))
 
             # Remove checkbox
             self.removetooltip = gtk.Tooltips()
-            self.removetooltip.set_tip(self.remove, "Remove files after shredding")
+            self.removetooltip.set_tip(self.remove, _("Remove files after shredding"))
             self.removelbltooltip = gtk.Tooltips()
-            self.removelbltooltip.set_tip(self.removelbl, "Remove files after shredding")
+            self.removelbltooltip.set_tip(self.removelbl, _("Remove files after shredding"))
 
             # Iteration text field
             self.itertftooltip = gtk.Tooltips()
-            self.itertftooltip.set_tip(self.itertf, "Shredding iterations per file")
+            self.itertftooltip.set_tip(self.itertf, _("Shredding iterations per file"))
 
             ## Packing widgets into window
 
