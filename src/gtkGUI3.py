@@ -151,10 +151,15 @@ class UI(Gtk.Window):
 		self.status = Gtk.Statusbar()
 		self.status.push(0, _("Idle"))
 		
+		#A separator to define left and right
+		self.main_sep = Gtk.Separator()
+		self.main_sep.set_orientation(Gtk.Orientation.VERTICAL)
+		
 		#the main box for the window
 		self.mainbox = Gtk.HBox()
 		self.mainbox.set_orientation(Gtk.Orientation.HORIZONTAL)
 		self.mainbox.pack_start(self.leftbox, True, True, 0)
+		self.mainbox.pack_start(self.main_sep, False, True, 0)
 		self.mainbox.pack_start(self.rightbox, True, True, 0)
 		
 		
