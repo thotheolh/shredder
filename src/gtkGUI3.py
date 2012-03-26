@@ -35,7 +35,7 @@ class UI(Gtk.Window):
 		self.dialog_response = Gtk.ResponseType.CANCEL
 		
 		#setup the main window
-		self.set_default_size(600, 400)
+		self.set_default_size(650, 400)
 		self.set_title(_("shredder"))
 		self.connect("destroy", self.on_quit)
 		
@@ -158,9 +158,9 @@ class UI(Gtk.Window):
 		#the main box for the window
 		self.mainbox = Gtk.HBox()
 		self.mainbox.set_orientation(Gtk.Orientation.HORIZONTAL)
-		self.mainbox.pack_start(self.leftbox, True, True, 0)
-		self.mainbox.pack_start(self.main_sep, False, True, 0)
-		self.mainbox.pack_start(self.rightbox, True, True, 0)
+		self.mainbox.pack_start(self.leftbox, True, True, 5)
+		self.mainbox.pack_start(self.main_sep, False, True, 5)
+		self.mainbox.pack_start(self.rightbox, True, True, 5)
 		
 		
 		

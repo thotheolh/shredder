@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 
-import os, sys, shutil
-
+import os, sys, gettext
+t = gettext.translation('shredder', 'locale', fallback=True)
+_ = t.ugettext
 class shreddable():
 
 #Constructor-------------------------------------------
@@ -27,7 +28,7 @@ class shreddable():
         if (self.gui != None):
 
            # Displays on the GUI output console the files that are being shredded at the moment
-           self.gui.insertText(_("Processing file ")+filename+"\n")
+           self.gui.insertText(_("Processing file ")+filename)
 
         os.system(command)
 
@@ -36,8 +37,9 @@ class shreddable():
 			for filename in filenames:
 				self.shred(os.path.join(dirname, filename))
 				
-		for dirs in os.listdir(self.filename):
-			shutil.rmtree(self.filename + "/" + dirs)
+		for files in os.listdir(self.filename):
+			if self.remove == True:
+				os.system("rm -r " + self.filename + "/" + files) 
 	
 	
 
@@ -48,7 +50,7 @@ class shreddable():
             if (self.gui != None):
 
                 # Displays on the GUI output console the files that are being shredded at the moment
-                self.gui.insertText("Warning! - "+self.filename+" does NOT EXIST! Please re-select a valid file.\n")
+                self.gui.insertText("Warning! - "+self.filename+" does NOT EXIST! Please re-select a valid file")
             else:
                 sys.exit("ERROR: filename does not exist-developers-check implementation of filename section")
 
