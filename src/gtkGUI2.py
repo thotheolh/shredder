@@ -17,12 +17,12 @@ except ImportError:
     print "PyGTK module does not exist. Can't launch GUI !"
     print "Please download and install GTK and PyGTK."
     importStatus = False
-    
-target = shreddable()
 
+target = shreddable(None,None,None,None,None)
+    
 if importStatus:
 
-    class gtkGUI():
+    class gtkGUI2():
 
         output = None
         filenametf = None
@@ -31,13 +31,13 @@ if importStatus:
         cwd = os.getcwd()
 
         def __init__(self):
-            print "Starting GTK Interface"
+            print "Starting Gnome 2 Interface"
             self.startGUI()
 
         def startGUI(self):
             print "GUI Started"
             self.window = gtk.Window(gtk.WINDOW_TOPLEVEL)
-            self.window.set_title("Shredder - v0.1 (Beta2)")
+            self.window.set_title("Shredder - v0.1 Stable")
             self.window.set_border_width(10)
             self.window.connect("destroy", self.destroy)
             self.window.set_icon_from_file(get_resource("img/shredder256.png"))
@@ -115,35 +115,35 @@ if importStatus:
 
             # Shred button
             self.shredtooltip = gtk.Tooltips()
-            self.shredtooltip.set_tip(self.shredbtn, _("Begin Shredding Files"))
+            self.shredtooltip.set_tip(self.shredbtn, "Begin Shredding Files")
 
             # File choose button
             self.filetooltip = gtk.Tooltips()
-            self.filetooltip.set_tip(self.filechoosebtn, _("Choose a file"))
+            self.filetooltip.set_tip(self.filechoosebtn, "Choose a file")
 
             # Folder choose button
             self.foldertooltip = gtk.Tooltips()
-            self.foldertooltip.set_tip(self.folderchoosebtn, _("Choose a folder"))
+            self.foldertooltip.set_tip(self.folderchoosebtn, "Choose a folder")
 
             # Trash button
             self.trashtooltip = gtk.Tooltips()
-            self.trashtooltip.set_tip(self.trashbtn, _("Shred Trash bin"))
+            self.trashtooltip.set_tip(self.trashbtn, "Shred Trash bin")
 
             # Zero-ing checkbox
             self.zerotooltip = gtk.Tooltips()
-            self.zerotooltip.set_tip(self.zero, _("Zero files when shredding"))
+            self.zerotooltip.set_tip(self.zero, "Zero files when shredding")
             self.zerolbltooltip = gtk.Tooltips()
-            self.zerolbltooltip.set_tip(self.zerolbl, _("Zero files when shredding"))
+            self.zerolbltooltip.set_tip(self.zerolbl, "Zero files when shredding")
 
             # Remove checkbox
             self.removetooltip = gtk.Tooltips()
-            self.removetooltip.set_tip(self.remove, _("Remove files after shredding"))
+            self.removetooltip.set_tip(self.remove, "Remove files after shredding")
             self.removelbltooltip = gtk.Tooltips()
-            self.removelbltooltip.set_tip(self.removelbl, _("Remove files after shredding"))
+            self.removelbltooltip.set_tip(self.removelbl, "Remove files after shredding")
 
             # Iteration text field
             self.itertftooltip = gtk.Tooltips()
-            self.itertftooltip.set_tip(self.itertf, _("Shredding iterations per file"))
+            self.itertftooltip.set_tip(self.itertf, "Shredding iterations per file")
 
             ## Packing widgets into window
 
@@ -261,11 +261,11 @@ if importStatus:
             if iter_num.isdigit():
                 if iter_num > 0:
                     # Proceed shredding operations
-                    target.iterations = iter_num
-                    target.filename = filename
-                    target.zero = is_zero
-                    target.remove = is_remove
-                    target.gui = self
+                    # target.iterations = iter_num
+                    # target.filename = filename
+                    # target.zero = is_zero
+                    # target.remove = is_remove
+                    # target.gui = self
                     self.insertText("Target File: "+filename+"\nIterations: "+iter_num+", Zero-ing: "+str(is_zero)+", Remove: "+str(is_remove)+".\n")
                     self.insertText("Here we go! Pray that it doesn't take anything bad out!\n")
                     # Begin shredding. Widgets disabled to prevent interruption in due process.
@@ -318,4 +318,3 @@ if importStatus:
         rel_path_to_resource = os.path.join(dir_of_py_file, rel_path)
         abs_path_to_resource = os.path.abspath(rel_path_to_resource)
         return abs_path_to_resource
-

@@ -20,11 +20,12 @@ along with this program; if not, write to the Free Software\n\
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.\n\
 ")
 
-version = "1.4 Pre-Alpha"
+version = "2.0 (Pre-Alpha)"
 
 class UI(Gtk.Window):
 	def __init__(self): #constructor
 		super(Gtk.Window, self).__init__()
+		print "Starting Gnome 3 Interface"
 		
 		#a few necessary variables
 		self.filenames = []

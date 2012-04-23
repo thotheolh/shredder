@@ -7,7 +7,6 @@ import sys, os
 ##TODO after impromptu meeting: make this cleaner, separate branches for the various toolkits
 
 from subprocess import *
-from gtkGUI3 import *
 
 desktop_environment = 'generic'
 if os.environ.get('KDE_FULL_SESSION') == 'true':
@@ -24,7 +23,7 @@ elif os.environ.get('GNOME_DESKTOP_SESSION_ID'):
         if g_version_array[0] == "2": # Major version is 2 therefore is Gnome 2
             print "Gnome version: ",g_version_array[0],"-", g_version
             from gtkGUI2 import *
-            mainwin =  UI() # Runs under Gnome 2 env using gtkGUI2.py
+            mainwin = gtkGUI2() # Runs under Gnome 2 env using gtkGUI2.py
         elif g_version_array[0] == "3": # Major version is 3 therefore is Gnome 3
             print "Gnome version:",g_version_array[0],"-", g_version
             from gtkGUI3 import *
