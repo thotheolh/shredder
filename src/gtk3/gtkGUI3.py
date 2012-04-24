@@ -22,7 +22,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.\
 
 version = "2.0 (Pre-Alpha)"
 
-class UI(Gtk.Window):
+class gtk3(Gtk.Window):
 	def __init__(self): # Constructor
 		super(Gtk.Window, self).__init__()
 		print "Starting Gnome 3 Interface"
@@ -42,6 +42,7 @@ class UI(Gtk.Window):
 		
 		# Main window
 		self.set_default_size(650, 400)
+		self.set_border_width(10)
 		self.set_title(_("Shredder " + version))
 		self.connect("destroy", self.on_quit)
 		
@@ -258,18 +259,17 @@ class UI(Gtk.Window):
         	data = bytes(model.get_value(iter, 0), "utf-8")
         	selection.set(selection.get_target(), 8, data)
 
-    	def drag_data_received_data(self, treeview, context, x, y, selection, info, etime):
-        	model = treeview.get_model()
-        	data = selection.get_data().decode("utf-8")
-		data = self.cleanse_drag_input(data)
-        	model.append([data])
-        	if context.get_actions() == Gdk.DragAction.MOVE:
-        	    context.finish(True, True, etime)
-		self.test()
-        	return
+	def drag_data_received_data(self, treeview, context, x, y, selection, info, etime):
+			model = treeview.get_model()
+			data = selection.get_data().decode("utf-8")
+			data = self.cleanse_drag_input(data)
+			model.append([data])
+			if context.get_actions() == Gdk.DragAction.MOVE:
+				context.finish(True, True, etime)
+			self.test()
+			return
 
 	def cleanse_drag_input(self, uri):
-		print "cleanse_drag_input() - uri - "+uri
 		path = ""
         	if uri.startswith("file:\\\\\\"): # windows
         	    # print "windows"
@@ -294,12 +294,6 @@ class UI(Gtk.Window):
 	def clear_treeview(self, button):
 		self.sidelist_model = Gtk.ListStore(str)
 		self.sidelist.set_model(self.sidelist_model)
-		return
-
-	def test(self):
-		treeiter = self.sidelist_model
-		for i in treeiter:
-			print str([treeiter][:])
 		return
 
 		

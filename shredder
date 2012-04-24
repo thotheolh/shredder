@@ -1,3 +1,0 @@
-#!/bin/sh
-
-python /usr/share/pyshared/shredder/mainGUI.py
