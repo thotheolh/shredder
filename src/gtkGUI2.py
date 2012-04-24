@@ -51,6 +51,10 @@ if importStatus:
             self.window.connect("destroy", self.destroy)
             self.window.set_icon_from_file(get_resource("img/shredder256.png"))
 
+            ## Tabs Panel
+            self.tabs = gtk.Notebook()
+            self.tabs.set_tab_pos(gtk.POS_BOTTOM)
+            
             ## Toolbar
             self.toolbar = gtk.Toolbar()
             self.toolbar.set_orientation(gtk.ORIENTATION_HORIZONTAL)
@@ -102,16 +106,6 @@ if importStatus:
             self.zero.set_active(True)
             self.remove = gtk.CheckButton(label=None)
             self.remove.set_active(False)
-
-            ## Text Fields - DEPRECIATED !
-            # self.filenametf = gtk.Entry(max=0)
-            # self.filenametf.connect("drag_data_received", on_drag_data_received)
-            # self.filenametf.drag_dest_set( gtk.DEST_DEFAULT_MOTION |
-            #       gtk.DEST_DEFAULT_HIGHLIGHT | gtk.DEST_DEFAULT_DROP,
-            #       self.dnd_list, gtk.gdk.ACTION_COPY)
-            # self.itertf = gtk.Entry(max=0)
-            # self.itertf.set_width_chars(8)
-            # self.itertf.set_text("5")
             
             ## Tree with scrolling
             self.scrolltree = gtk.ScrolledWindow()
@@ -126,60 +120,16 @@ if importStatus:
             self.tree.connect("drag_data_received",         self.drag_data_received_data)
             self.scrolltree.add(self.tree)
 
-            ## Text View with frame wrapping
-            self.page_size = gtk.Adjustment(lower=100, page_size=100)
-            self.sw = gtk.ScrolledWindow(self.page_size)
-            self.sw.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-            self.output = gtk.TextView()
-            self.output.set_wrap_mode(gtk.WRAP_WORD)
-            self.output.set_editable(False)
-            self.sw.add(self.output)
-            self.frame = gtk.Frame()
-            self.frame.set_label(" Status: ")
-            self.frame.set_shadow_type(gtk.SHADOW_ETCHED_OUT)
-            self.frame.add(self.sw)
-
-            ## Tooltip Text
-
             # Shred button
             self.shredtooltip = gtk.Tooltips()
             self.shredtooltip.set_tip(self.shredbtn, "Begin Shredding Files")
 
-            # File choose button
-            # self.filetooltip = gtk.Tooltips()
-            # self.filetooltip.set_tip(self.filechoosebtn, "Choose a file")
-
-            # Folder choose button
-            # self.foldertooltip = gtk.Tooltips()
-            # self.foldertooltip.set_tip(self.folderchoosebtn, "Choose a folder")
-
-            # Trash button
-            # self.trashtooltip = gtk.Tooltips()
-            # self.trashtooltip.set_tip(self.trashbtn, "Shred Trash bin")
-
-            # Zero-ing checkbox
-            # self.zerotooltip = gtk.Tooltips()
-            # self.zerotooltip.set_tip(self.zero, "Zero files when shredding")
-            # self.zerolbltooltip = gtk.Tooltips()
-            # self.zerolbltooltip.set_tip(self.zerolbl, "Zero files when shredding")
-
-            # Remove checkbox
-            # self.removetooltip = gtk.Tooltips()
-            # self.removetooltip.set_tip(self.remove, "Remove files after shredding")
-            # self.removelbltooltip = gtk.Tooltips()
-            # self.removelbltooltip.set_tip(self.removelbl, "Remove files after shredding")
-
-            # Iteration text field
-            # self.itertftooltip = gtk.Tooltips()
-            # self.itertftooltip.set_tip(self.itertf, "Shredding iterations per file")
-
             # Adding items to toolbar
-            self.toolbar.append_item("Add File", "Choose a file","Private", self.fileimg, self.do_shred)
-            self.toolbar.append_item("Add Folder", "Choose a folder","Private", self.folderimg, self.do_shred)
-            self.toolbar.append_item("Shred Trash", "Shred Trash bin","Private", self.trashimg, self.do_shred)
-            self.toolbar.append_item("Remove File/Folder", "Remove file/folder from shredding list","Private", self.trashimg, self.do_shred)
-            self.toolbar.append_item("Clear List", "Clear shredding list","Private", self.trashimg, self.do_shred)
-
+            self.toolbar.append_item("Add File", "Choose a file","Private", self.fileimg, self.get_filechooser_callback)
+            self.toolbar.append_item("Add Folder", "Choose a folder","Private", self.folderimg, self.get_folderchooser_callback)
+            self.toolbar.append_item("Shred Trash", "Shred Trash bin","Private", self.trashimg, self.shred_trash)
+            self.toolbar.append_item("Remove File/Folder", "Remove file/folder from shredding list","Private", self.trashimg, self.clear_selected)
+            self.toolbar.append_item("Clear List", "Clear shredding list","Private", self.trashimg, self.clear_treeview)
 
             ## Packing widgets into window
 
@@ -192,55 +142,43 @@ if importStatus:
 
             # treebox to contain treeview
             self.treebox = gtk.HBox(homogeneous=False, spacing=0)
-            self.vbox.pack_start(self.scrolltree, expand=False, fill=False, padding=0)
-
-            # filebox to contain file-based widgets
-            self.filebox = gtk.HBox(homogeneous=False, spacing=0)
-            self.filebox.pack_start(self.toolbar, expand=True, fill=True, padding=5)
-            #self.filebox.pack_start(self.filelbl, expand=False, fill=False, padding=10)
-            # self.filebox.pack_start(self.filenametf, expand=False, fill=False, padding=0)
-            # self.filebox.pack_start(self.filechoosebtn, expand=False, fill=False, padding=10)
-            # self.filebox.pack_start(self.folderchoosebtn, expand=False, fill=False, padding=0)
-            # self.filebox.pack_start(self.trashbtn, expand=False, fill=False, padding=10)
-
-            self.vbox.pack_start(self.filebox, expand=False, fill=False, padding=0)
-
-
-            # sctrlbox to contain shred control widgets
-            self.sctrlbox = gtk.HBox(homogeneous=False, spacing=0)
-            # self.sctrlbox.pack_start(self.iterationlbl, expand=False, fill=False, padding=10)
-            # self.sctrlbox.pack_start(self.itertf, expand=False, fill=False, padding=0)
-            # self.sctrlbox.pack_start(self.zerolbl, expand=False, fill=False, padding=10)
-            # self.sctrlbox.pack_start(self.zero, expand=False, fill=False, padding=0)
-            # self.sctrlbox.pack_start(self.removelbl, expand=False, fill=False, padding=10)
-            # self.sctrlbox.pack_start(self.remove, expand=False, fill=False, padding=0)
-            # self.vbox.pack_start(self.sctrlbox, expand=False, fill=False, padding=5)         
-
-            # Output View
-            self.vbox.pack_start(self.toolbar, expand=True, fill=True, padding=0)
-            
-            # Shred button
+            self.vbox.pack_start(self.scrolltree, expand=True, fill=True, padding=0)        
             self.shredbox = gtk.HBox(homogeneous=False, spacing=0)
             self.shredbox.pack_end(self.shredbtn, expand=False, fill=False, padding=5)
-            self.vbox.pack_end(self.shredbox, expand=False, fill=False, padding=5)
+            
+            # Prepare tabs
+            self.tabs.append_page(self.vbox, gtk.Label("File Shredding"))
+            self.settingsbox = gtk.VBox(homogeneous=False, spacing=0)            
+            self.tabs.append_page(self.settingsbox, gtk.Label("Settings"))
+
+            # Overall VBox
+            self.mainbox = gtk.VBox(homogeneous=False, spacing=0)
+            self.mainbox.pack_start(self.tabs, expand=True, fill=True, padding=0)
+            self.mainbox.pack_end(self.shredbox, expand=False, fill=False, padding=0)
 
 
             ## Presenting window
+            self.tabs.show()
             self.toolbar.show()
-            self.window.add(self.vbox)
+            self.window.add(self.mainbox)
             self.window.show_all()
             gtk.main()
             return None
 
+        ## Check GTK version
         def checkGtkVersion(self):
             return gtk.gtk_version
         
+        ## Check PyGTK version
         def checkPyGTKVersion(self):
             return gtk.pygtk_version
 
+        ## Closes main window
         def destroy(self, widget, data=None):
             return gtk.main_quit()
 
+        ## Output status
+        ## Need to upgrade for status label use
         def insertText(self, text):
             if(self.output == None):
                 print "Empty Output"
@@ -248,10 +186,12 @@ if importStatus:
                 self.buffer = self.output.get_buffer()
                 self.buffer.insert_at_cursor(text)
 
-        def get_trash_callback(self, widget, data=None):
+        ## Trash bin selected for secure wiping
+        def shred_trash(self, widget, data=None):
             loc = os.getenv("HOME")
-            self.filenametf.set_text(loc + "/.local/share/Trash")
+            self.tree_add_item(loc + "/.local/share/Trash")
 
+        ## Filechooser
         def get_filechooser_callback(self, widget, data=None):
             self.chooser = gtk.FileChooserDialog(title=None,action=gtk.FILE_CHOOSER_ACTION_OPEN,
                                   buttons=(gtk.STOCK_CANCEL,gtk.RESPONSE_CANCEL,gtk.STOCK_OPEN,gtk.RESPONSE_OK))
@@ -259,11 +199,12 @@ if importStatus:
             self.chooser.set_current_folder(os.getenv("HOME"))
             response = self.chooser.run()
             if response == gtk.RESPONSE_OK:
-                self.filenametf.set_text(self.chooser.get_filename())
+                self.tree_add_item(self.chooser.get_filename())
             elif response == gtk.RESPONSE_CANCEL:
                 self.chooser.destroy()
             self.chooser.destroy()
 
+        ## Folderchooser
         def get_folderchooser_callback(self, widget, data=None):
             self.chooser = gtk.FileChooserDialog(title=None,action=gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER,
                                   buttons=(gtk.STOCK_CANCEL,gtk.RESPONSE_CANCEL,gtk.STOCK_OPEN,gtk.RESPONSE_OK))
@@ -271,11 +212,12 @@ if importStatus:
             self.chooser.set_current_folder(os.getenv("HOME"))
             response = self.chooser.run()
             if response == gtk.RESPONSE_OK:
-                self.filenametf.set_text(self.chooser.get_filename())
+                self.tree_add_item(self.chooser.get_filename())
             elif response == gtk.RESPONSE_CANCEL:
                 self.chooser.destroy()
             self.chooser.destroy()
 
+        ## Disables widget
         def disable_widgets(self):
             self.filenametf.set_sensitive(False)
             self.itertf.set_sensitive(False)
@@ -285,6 +227,7 @@ if importStatus:
             self.zero.set_sensitive(False)
             self.shredbtn.set_sensitive(False)
 
+        ## Enables widgets
         def enable_widgets(self):
             self.filenametf.set_sensitive(True)
             self.itertf.set_sensitive(True)
@@ -293,32 +236,25 @@ if importStatus:
             self.trashbtn.set_sensitive(True)
             self.zero.set_sensitive(True)
             self.shredbtn.set_sensitive(True)
-            # self.insertText("Widgets enabled\n")
 
+        ## Get data when drag occurs inside the tree
         def drag_data_get_data(self, treeview, context, selection, target_id, etime):
             treeselection = treeview.get_selection()
             model, iter = treeselection.get_selected()
             data = model.get_value(iter, 0)
             selection.set(selection.target, 8, data)
 
+        ## Receives the data that is dropped into the tree after the drag
         def drag_data_received_data(self, treeview, context, x, y, selection, info, etime):
             model = treeview.get_model()
             data = selection.data
-            drop_info = treeview.get_dest_row_at_pos(x, y)
-            if drop_info:
-                path, position = drop_info
-                iter = model.get_iter(path)
-                if (position == gtk.TREE_VIEW_DROP_BEFORE
-                    or position == gtk.TREE_VIEW_DROP_INTO_OR_BEFORE):
-                        model.insert_before(iter, [data])
-                else:
-                    model.insert_after(iter, [data])
-            else:
-                model.append([data])
+            data = self.cleanse_drag_input(data)
+            model.append([data])
             if context.action == gtk.gdk.ACTION_MOVE:
                 context.finish(True, True, etime)
             return
 
+        ## Shred !!!
         def do_shred(self, widget, data=None):
             filename = self.filenametf.get_text()
             iter_num = self.itertf.get_text()
@@ -364,7 +300,7 @@ if importStatus:
                     path = get_file_path_from_dnd_dropped_uri(uri)
                     widget.set_text(path)
                 
-        def get_file_path_from_dnd_dropped_uri(uri):
+        def cleanse_drag_input(self, uri):
             ## get the path to file
             path = ""
             if uri.startswith("file:\\\\\\"): # windows
@@ -380,6 +316,25 @@ if importStatus:
             path = path.strip('\r\n\x00') # remove \r\n and NULL
             return path
 
+        ## Clears a selected item from tree
+        def clear_selected(self, button):
+		    selection = self.tree.get_selection()
+		    model, iter = selection.get_selected()
+		    if iter:
+			    model.remove(iter)
+		    return
+
+        ## Clears the entire tree
+        def clear_treeview(self, button):
+		    self.liststore.clear()
+		    return
+
+        #add a generic item to the list
+        def tree_add_item(self, item):
+            self.liststore.append([item])
+            return
+
+    ## Get the relative working path of the current files
     def get_resource(rel_path):
         dir_of_py_file = os.path.dirname(__file__)
         rel_path_to_resource = os.path.join(dir_of_py_file, rel_path)

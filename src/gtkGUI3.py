@@ -262,7 +262,7 @@ class UI(Gtk.Window):
     	def drag_data_received_data(self, treeview, context, x, y, selection, info, etime):
         	model = treeview.get_model()
         	data = selection.get_data().decode("utf-8")
-		data = self.cleanse_drag_input(data)
+		    data = self.cleanse_drag_input(data)
         	model.append([data])
         	if context.get_actions() == Gdk.DragAction.MOVE:
         	    context.finish(True, True, etime)
@@ -270,7 +270,6 @@ class UI(Gtk.Window):
         	return
 
 	def cleanse_drag_input(self, uri):
-		print "cleanse_drag_input() - uri - "+uri
 		path = ""
         	if uri.startswith("file:\\\\\\"): # windows
         	    # print "windows"
