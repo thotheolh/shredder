@@ -62,7 +62,7 @@ if importStatus:
             self.toolbar.set_border_width(5)
             
             ## Labels
-            #self.filelbl = gtk.Label("File / Folder: ")
+            self.statuslbl = gtk.Label("Idle")
             #self.iterationlbl = gtk.Label("Shred Iterations: ")
             #self.zerolbl = gtk.Label("Zero-ing: ")
             #self.removelbl = gtk.Label("Remove: ")
@@ -131,6 +131,9 @@ if importStatus:
             self.toolbar.append_item("Remove File/Folder", "Remove file/folder from shredding list","Private", self.trashimg, self.clear_selected)
             self.toolbar.append_item("Clear List", "Clear shredding list","Private", self.trashimg, self.clear_treeview)
 
+            # Progress bar
+            self.progress = gtk.ProgressBar()
+
             ## Packing widgets into window
 
             # Vertical box to contain all boxes
@@ -154,11 +157,18 @@ if importStatus:
             # Overall VBox
             self.mainbox = gtk.VBox(homogeneous=False, spacing=0)
             self.mainbox.pack_start(self.tabs, expand=True, fill=True, padding=0)
-            self.mainbox.pack_end(self.shredbox, expand=False, fill=False, padding=0)
+            self.mainbox.pack_start(self.shredbox, expand=False, fill=False, padding=5)
+            self.statusbox = gtk.HBox(homogeneous=False, spacing=0)
+            self.statusbox.pack_start(self.statuslbl, expand=False, fill=False, padding=0)
+            self.separator = gtk.HSeparator()
+            self.mainbox.pack_start(self.separator, expand=False, fill=False, padding=0)
+            self.mainbox.pack_start(self.progress, expand=False, fill=False, padding=5)
+            self.mainbox.pack_end(self.statusbox, expand=False, fill=False, padding=0)
 
 
             ## Presenting window
-            self.tabs.show()
+            self.tabs.show()            
+            self.progress.show()
             self.toolbar.show()
             self.window.add(self.mainbox)
             self.window.show_all()
@@ -179,12 +189,8 @@ if importStatus:
 
         ## Output status
         ## Need to upgrade for status label use
-        def insertText(self, text):
-            if(self.output == None):
-                print "Empty Output"
-            else:
-                self.buffer = self.output.get_buffer()
-                self.buffer.insert_at_cursor(text)
+        def set_status(self, text):
+            statuslbl.set_text(text)
 
         ## Trash bin selected for secure wiping
         def shred_trash(self, widget, data=None):
