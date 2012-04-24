@@ -42,7 +42,6 @@ class UI(Gtk.Window):
 		
 		# Main window
 		self.set_default_size(650, 400)
-        self.set_border_width(10)
 		self.set_title(_("Shredder " + version))
 		self.connect("destroy", self.on_quit)
 		
@@ -295,6 +294,12 @@ class UI(Gtk.Window):
 	def clear_treeview(self, button):
 		self.sidelist_model = Gtk.ListStore(str)
 		self.sidelist.set_model(self.sidelist_model)
+		return
+
+	def test(self):
+		treeiter = self.sidelist_model
+		for i in treeiter:
+			print str([treeiter][:])
 		return
 
 		
