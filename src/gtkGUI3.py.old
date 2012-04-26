@@ -22,154 +22,116 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.\
 
 version = "2.0 (Pre-Alpha)"
 
-class gtk3(Gtk.Window):
-	def __init__(self): # Constructor
+class UI(Gtk.Window):
+	def __init__(self): #constructor
 		super(Gtk.Window, self).__init__()
 		print "Starting Gnome 3 Interface"
 		
+		#a few necessary variables
 		self.filenames = []
 		self.shred_list = []
 		self.iterations = 1
 		self.remove = False
 		self.zero = False
 		self.dialog_response = Gtk.ResponseType.CANCEL
-
-		self.TARGETS = [('MY_TREE_MODEL_ROW',Gtk.TargetFlags.SAME_WIDGET,0),
-			   ('text/plain', 0, 1),
-			   ('TEXT', 0, 2),
-			   ('STRING',0, 3)
-			   ]
 		
-		## Main window
+		#setup the main window
 		self.set_default_size(650, 400)
-		self.set_border_width(10)
-		self.set_title(_("Shredder " + version))
-		self.connect("destroy", self.on_quit)	
-
+		self.set_title(_("shredder"))
+		self.connect("destroy", self.on_quit)
+		
 		#An action group for the menus
-                self.actions = Gtk.ActionGroup("menu actions") 
-
-		# menu and toolbar stuff
-                self.menuxml = """
-                <ui>
-                <menubar name='MenuBar'>
-                        <menu action='File'>
-                                <menuitem action = 'FileFile' />
-                                <menuitem action = 'FileFolder' />
-                                <menuitem action = 'FileQuit' />
-                        </menu>
-                        <menu action='Edit'>
-                                <menuitem action = 'EditPref' />
-                        </menu>
-                        <menu action='Help'>
-                                <menuitem action ='HelpAbout' />
-                        </menu>
-                </menubar>
-		<toolbar name='ToolBar'>
-			<toolitem action='FileFile' />
- 			<toolitem action = 'FileFolder' />
-		</toolbar>
-                </ui>
-                """
+		self.actions = Gtk.ActionGroup("menu actions")
 		
-                self.menumanager = Gtk.UIManager()
-                self.menumanager.add_ui_from_string(self.menuxml)
-                self.menumanager.insert_action_group(self.actions)
-                
-                self.action_file = Gtk.Action("File", _("File"), None, None)
-                self.action_edit = Gtk.Action("Edit", _("Edit"), None, None)
-                self.action_help = Gtk.Action("Help", _("Help"), None, None)
-                self.action_file_file = Gtk.Action("FileFile", _("Open a file"), None, None)
-                self.action_file_folder = Gtk.Action("FileFolder", _("Open a folder"), None, None)
-                self.action_file_quit = Gtk.Action("FileQuit", _("Quit"), None, None)
-                self.action_edit_pref = Gtk.Action("EditPref", None, None, Gtk.STOCK_PREFERENCES)
-                self.action_help_about = Gtk.Action("HelpAbout", None, None, Gtk.STOCK_ABOUT)
-                
-                self.action_file_file.connect("activate", self.on_open_file)
-                self.action_file_folder.connect("activate", self.on_open_folder)
-                self.action_file_quit.connect("activate", self.on_quit)
-                self.action_edit_pref.connect("activate", self.on_open_pref)
-                self.action_help_about.connect("activate", self.on_help)
-                
-                self.actions.add_action(self.action_file)
-                self.actions.add_action(self.action_help)
-                self.actions.add_action(self.action_file_file)
-                self.actions.add_action(self.action_file_folder)
-                self.actions.add_action(self.action_file_quit)
-                self.actions.add_action(self.action_edit)
-                self.actions.add_action(self.action_edit_pref)
-                self.actions.add_action(self.action_help_about)
-                
-                #The menu
-                self.menu = self.menumanager.get_widget("/MenuBar")
-
-		# The toolbar
-		self.toolbar = self.menumanager.get_widget("/ToolBar")
 		
-		# Tree showing the files, and associated objects
+		#menu stuff
+		self.menuxml = """
+		<ui>
+		<menubar name='MenuBar'>
+			<menu action='File'>
+				<menuitem action = 'FileFile' />
+				<menuitem action = 'FileFolder' />
+				<menuitem action = 'FileQuit' />
+			</menu>
+			<menu action='Edit'>
+				<menuitem action = 'EditPref' />
+			</menu>
+			<menu action='Help'>
+				<menuitem action ='HelpAbout' />
+			</menu>
+		</menubar>
+		</ui>
+		"""
+		self.menumanager = Gtk.UIManager()
+		self.menumanager.add_ui_from_string(self.menuxml)
+		self.menumanager.insert_action_group(self.actions)
+		
+		self.action_file = Gtk.Action("File", _("File"), None, None)
+		self.action_edit = Gtk.Action("Edit", _("Edit"), None, None)
+		self.action_help = Gtk.Action("Help", _("Help"), None, None)
+		self.action_file_file = Gtk.Action("FileFile", _("Open a file"), None, None)
+		self.action_file_folder = Gtk.Action("FileFolder", _("Open a folder"), None, None)
+		self.action_file_quit = Gtk.Action("FileQuit", _("Quit"), None, None)
+		self.action_edit_pref = Gtk.Action("EditPref", None, None, Gtk.STOCK_PREFERENCES)
+		self.action_help_about = Gtk.Action("HelpAbout", None, None, Gtk.STOCK_ABOUT)
+		
+		self.action_file_file.connect("activate", self.on_open_file)
+		self.action_file_folder.connect("activate", self.on_open_folder)
+		self.action_file_quit.connect("activate", self.on_quit)
+		self.action_edit_pref.connect("activate", self.on_open_pref)
+		self.action_help_about.connect("activate", self.on_help)
+		
+		self.actions.add_action(self.action_file)
+		self.actions.add_action(self.action_help)
+		self.actions.add_action(self.action_file_file)
+		self.actions.add_action(self.action_file_folder)
+		self.actions.add_action(self.action_file_quit)
+		self.actions.add_action(self.action_edit)
+		self.actions.add_action(self.action_edit_pref)
+		self.actions.add_action(self.action_help_about)
+		
+		#The menu
+		self.menu = self.menumanager.get_widget("/MenuBar")
+		
+		#a Gtk.TreeView showing the files, and associated objects
 		self.sidelist = Gtk.TreeView()
 		self.sidelist_model = Gtk.ListStore(str)
 		self.sidelist_column = Gtk.CellRendererText()
-		self.sidelist_title = Gtk.TreeViewColumn(_("Files and folders for shredding... (You can drag and drop files and folders below)"))
+		self.sidelist_title = Gtk.TreeViewColumn(_("Files"))
+		
+		#setting up the TreeView
 		self.sidelist.set_model(self.sidelist_model)
 		self.sidelist_title.pack_start(self.sidelist_column, False)
 		self.sidelist_title.add_attribute(self.sidelist_column, "text", 0)
-		self.sidelist.enable_model_drag_source(Gdk.ModifierType.BUTTON1_MASK,self.TARGETS,Gdk.DragAction.DEFAULT|Gdk.DragAction.MOVE)
-		self.sidelist.enable_model_drag_dest(self.TARGETS, Gdk.DragAction.DEFAULT)
-		self.sidelist.drag_dest_add_text_targets()
-		self.sidelist.drag_source_add_text_targets()
-		self.sidelist.connect("drag_data_get", self.drag_data_get_data)
-		self.sidelist.connect("drag_data_received", self.drag_data_received_data)
 		self.sidelist.append_column(self.sidelist_title)
 			
 		#A place for drag and drop, currently not functional (Tay fix!)
-		#self.dnd_area = Gtk.Label()
-		#self.dnd_area.set_label(_("Drag files here to add them"))
+		self.dnd_area = Gtk.Label()
+		self.dnd_area.set_label(_("Drag files here to add them"))
 		#self.dnd_area.drag_dest_set(Gtk.DestDefaults.ALL, [], Gdk.DragAction.COPY)
-		#self.dnd_area.connect("drag-data-received", self.on_drag_data)
+		self.dnd_area.connect("drag-data-received", self.on_drag_data)
 		
-		# Button to shred everything
+		#A Button to shred everything
 		self.shred = Gtk.Button(_("Shred Files"))
 		self.shred.connect("clicked", self.shred_all)
 	
-		# Button to add trash
+		#A Button to add trash
 		self.trash = Gtk.Button(_("Shred Trash"))
 		self.trash.connect("clicked", self.sidelist_add_trash)
-
-		# Button to add files for shredding
-		self.addfile = Gtk.Button(_("Add File"))
-		self.addfile.connect("clicked", self.on_open_file)
-
-		# Button to add folder for shredding
-		self.addfolder = Gtk.Button(_("Add Folder"))
-		self.addfolder.connect("clicked", self.on_open_folder)
-
-		# Button to remove selected item
-		self.remove = Gtk.Button(_("Remove Item"))
-		self.remove.connect("clicked", self.clear_selected)
-
-		# Button to remove all items in tree
-		self.removeall = Gtk.Button(_("Clear All Items"))
-		self.removeall.connect("clicked", self.clear_treeview)
 		
 		#A Gtk.Button to hold necessary buttons
 		self.controlpanel = Gtk.HBox(orientation = Gtk.Orientation.HORIZONTAL)
 		self.controlpanel.pack_end(self.shred, False, False, 0)
-		self.controlpanel.pack_end(self.addfolder, False, False, 0)
-		self.controlpanel.pack_end(self.addfile, False, False, 0)
-		self.controlpanel.pack_end(self.remove, False, False, 0)
-		self.controlpanel.pack_end(self.removeall, False, False, 0)
 		self.controlpanel.pack_end(self.trash, False, False, 0)
 		
 		#A Gtk.Box to hold the controlpanel and dnd_area
-		#self.rightbox = Gtk.VBox(orientation = Gtk.Orientation.VERTICAL)
-		#self.rightbox.pack_start(self.dnd_area, True, True, 0)
-		#self.rightbox.pack_start(self.controlpanel, False, False, 0)
+		self.rightbox = Gtk.VBox(orientation = Gtk.Orientation.VERTICAL)
+		self.rightbox.pack_start(self.dnd_area, True, True, 0)
+		self.rightbox.pack_start(self.controlpanel, False, False, 0)
 		
 		#A Gtk.Box to hold the sidelist and any future widgets
-		self.box = Gtk.VBox(orientation = Gtk.Orientation.VERTICAL)
-		self.box.pack_start(self.sidelist, True, True, 0)		
-		self.box.pack_start(self.controlpanel, False, False, 10)
+		self.leftbox = Gtk.VBox(orientation = Gtk.Orientation.VERTICAL)
+		self.leftbox.pack_start(self.sidelist, True, True, 0)		
 		
 		#An About Dialog, where the developers get to show off.
 		#If you're a contributor, please add yourself here.
@@ -195,16 +157,14 @@ class gtk3(Gtk.Window):
 		#the main box for the window
 		self.mainbox = Gtk.HBox()
 		self.mainbox.set_orientation(Gtk.Orientation.HORIZONTAL)
-		#self.mainbox.pack_start(self.leftbox, True, True, 5)
-		#self.mainbox.pack_start(self.main_sep, False, True, 5)
-		#self.mainbox.pack_start(self.rightbox, True, True, 5)
-		self.mainbox.pack_start(self.box, True, True, 5)
+		self.mainbox.pack_start(self.leftbox, True, True, 5)
+		self.mainbox.pack_start(self.main_sep, False, True, 5)
+		self.mainbox.pack_start(self.rightbox, True, True, 5)
 		
 		#include mainbox and menu
 		self.masterbox = Gtk.VBox()
 		self.masterbox.set_orientation(Gtk.Orientation.VERTICAL)
 		self.masterbox.pack_start(self.menu, False, False, 0)
-		self.masterbox.pack_start(self.toolbar, False, False, 0)
 		self.masterbox.pack_start(self.mainbox, True, True, 0)
 		self.masterbox.pack_start(self.progress, False, False, 0)
 		self.masterbox.pack_start(self.status, False, False, 0)
@@ -304,6 +264,11 @@ class gtk3(Gtk.Window):
 		self.shred_list = []
 		self.progress.set_fraction(0)
 		self.status.push(0, _("Idle"))
+			
+			
+	def on_drag_data(self, widget, drag_context, x, y, data, info, time):
+		print("Something dropped")
+		
 	
 	#output text
 	def insertText(self, output):
@@ -314,50 +279,6 @@ class gtk3(Gtk.Window):
 		#processing the files. TODO: better threading control.
 		while Gtk.events_pending():
 			Gtk.main_iteration()
-
-	def drag_data_get_data(self, treeview, context, selection, target_id, etime):
-        	treeselection = treeview.get_selection()
-        	model, iter = treeselection.get_selected()
-        	data = bytes(model.get_value(iter, 0), "utf-8")
-        	selection.set(selection.get_target(), 8, data)
-
-	def drag_data_received_data(self, treeview, context, x, y, selection, info, etime):
-			model = treeview.get_model()
-			data = selection.get_data().decode("utf-8")
-			data = self.cleanse_drag_input(data)
-			model.append([data])
-			if context.get_actions() == Gdk.DragAction.MOVE:
-				context.finish(True, True, etime)
-			self.test()
-			return
-
-	def cleanse_drag_input(self, uri):
-		path = ""
-        	if uri.startswith("file:\\\\\\"): # windows
-        	    # print "windows"
-        	    path = uri[8:] # 8 is len('file:///')
-        	elif uri.startswith("file://"): # nautilus, rox
-        	    # print "nautilus"
-        	    path = uri[7:] # 7 is len('file://')
-        	elif uri.startswith("file:"): # xffm
-        	    # print "xffm"
-        	    path = uri[5:] # 5 is len('file:')
-        	path = urllib.url2pathname(path) # escape special chars
-        	path = path.strip('\r\n\x00') # remove \r\n and NULL
-        	return path
-
-	def clear_selected(self, button):
-		selection = self.sidelist.get_selection()
-		model, iter = selection.get_selected()
-		if iter:
-			model.remove(iter)
-		return
-
-	def clear_treeview(self, button):
-		self.sidelist_model = Gtk.ListStore(str)
-		self.sidelist.set_model(self.sidelist_model)
-		return
-
 		
 	
 

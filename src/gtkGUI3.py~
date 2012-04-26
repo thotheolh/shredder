@@ -22,7 +22,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.\
 
 version = "2.0 (Pre-Alpha)"
 
-class gtk3(Gtk.Window):
+class UI(Gtk.Window):
 	def __init__(self): # Constructor
 		super(Gtk.Window, self).__init__()
 		print "Starting Gnome 3 Interface"
@@ -40,77 +40,16 @@ class gtk3(Gtk.Window):
 			   ('STRING',0, 3)
 			   ]
 		
-		## Main window
+		# Main window
 		self.set_default_size(650, 400)
-		self.set_border_width(10)
 		self.set_title(_("Shredder " + version))
-		self.connect("destroy", self.on_quit)	
-
-		#An action group for the menus
-                self.actions = Gtk.ActionGroup("menu actions") 
-
-		# menu and toolbar stuff
-                self.menuxml = """
-                <ui>
-                <menubar name='MenuBar'>
-                        <menu action='File'>
-                                <menuitem action = 'FileFile' />
-                                <menuitem action = 'FileFolder' />
-                                <menuitem action = 'FileQuit' />
-                        </menu>
-                        <menu action='Edit'>
-                                <menuitem action = 'EditPref' />
-                        </menu>
-                        <menu action='Help'>
-                                <menuitem action ='HelpAbout' />
-                        </menu>
-                </menubar>
-		<toolbar name='ToolBar'>
-			<toolitem action='FileFile' />
- 			<toolitem action = 'FileFolder' />
-		</toolbar>
-                </ui>
-                """
-		
-                self.menumanager = Gtk.UIManager()
-                self.menumanager.add_ui_from_string(self.menuxml)
-                self.menumanager.insert_action_group(self.actions)
-                
-                self.action_file = Gtk.Action("File", _("File"), None, None)
-                self.action_edit = Gtk.Action("Edit", _("Edit"), None, None)
-                self.action_help = Gtk.Action("Help", _("Help"), None, None)
-                self.action_file_file = Gtk.Action("FileFile", _("Open a file"), None, None)
-                self.action_file_folder = Gtk.Action("FileFolder", _("Open a folder"), None, None)
-                self.action_file_quit = Gtk.Action("FileQuit", _("Quit"), None, None)
-                self.action_edit_pref = Gtk.Action("EditPref", None, None, Gtk.STOCK_PREFERENCES)
-                self.action_help_about = Gtk.Action("HelpAbout", None, None, Gtk.STOCK_ABOUT)
-                
-                self.action_file_file.connect("activate", self.on_open_file)
-                self.action_file_folder.connect("activate", self.on_open_folder)
-                self.action_file_quit.connect("activate", self.on_quit)
-                self.action_edit_pref.connect("activate", self.on_open_pref)
-                self.action_help_about.connect("activate", self.on_help)
-                
-                self.actions.add_action(self.action_file)
-                self.actions.add_action(self.action_help)
-                self.actions.add_action(self.action_file_file)
-                self.actions.add_action(self.action_file_folder)
-                self.actions.add_action(self.action_file_quit)
-                self.actions.add_action(self.action_edit)
-                self.actions.add_action(self.action_edit_pref)
-                self.actions.add_action(self.action_help_about)
-                
-                #The menu
-                self.menu = self.menumanager.get_widget("/MenuBar")
-
-		# The toolbar
-		self.toolbar = self.menumanager.get_widget("/ToolBar")
+		self.connect("destroy", self.on_quit)
 		
 		# Tree showing the files, and associated objects
 		self.sidelist = Gtk.TreeView()
 		self.sidelist_model = Gtk.ListStore(str)
 		self.sidelist_column = Gtk.CellRendererText()
-		self.sidelist_title = Gtk.TreeViewColumn(_("Files and folders for shredding... (You can drag and drop files and folders below)"))
+		self.sidelist_title = Gtk.TreeViewColumn(_("Files and folders for shredding..."))
 		self.sidelist.set_model(self.sidelist_model)
 		self.sidelist_title.pack_start(self.sidelist_column, False)
 		self.sidelist_title.add_attribute(self.sidelist_column, "text", 0)
@@ -203,8 +142,6 @@ class gtk3(Gtk.Window):
 		#include mainbox and menu
 		self.masterbox = Gtk.VBox()
 		self.masterbox.set_orientation(Gtk.Orientation.VERTICAL)
-		self.masterbox.pack_start(self.menu, False, False, 0)
-		self.masterbox.pack_start(self.toolbar, False, False, 0)
 		self.masterbox.pack_start(self.mainbox, True, True, 0)
 		self.masterbox.pack_start(self.progress, False, False, 0)
 		self.masterbox.pack_start(self.status, False, False, 0)
@@ -321,17 +258,18 @@ class gtk3(Gtk.Window):
         	data = bytes(model.get_value(iter, 0), "utf-8")
         	selection.set(selection.get_target(), 8, data)
 
-	def drag_data_received_data(self, treeview, context, x, y, selection, info, etime):
-			model = treeview.get_model()
-			data = selection.get_data().decode("utf-8")
-			data = self.cleanse_drag_input(data)
-			model.append([data])
-			if context.get_actions() == Gdk.DragAction.MOVE:
-				context.finish(True, True, etime)
-			self.test()
-			return
+    	def drag_data_received_data(self, treeview, context, x, y, selection, info, etime):
+        	model = treeview.get_model()
+        	data = selection.get_data().decode("utf-8")
+		data = self.cleanse_drag_input(data)
+        	model.append([data])
+        	if context.get_actions() == Gdk.DragAction.MOVE:
+        	    context.finish(True, True, etime)
+		self.test()
+        	return
 
 	def cleanse_drag_input(self, uri):
+		print "cleanse_drag_input() - uri - "+uri
 		path = ""
         	if uri.startswith("file:\\\\\\"): # windows
         	    # print "windows"
@@ -356,6 +294,12 @@ class gtk3(Gtk.Window):
 	def clear_treeview(self, button):
 		self.sidelist_model = Gtk.ListStore(str)
 		self.sidelist.set_model(self.sidelist_model)
+		return
+
+	def test(self):
+		treeiter = self.sidelist_model
+		for i in treeiter:
+			print str([treeiter][:])
 		return
 
 		
