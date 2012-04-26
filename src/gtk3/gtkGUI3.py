@@ -248,7 +248,7 @@ class gtk3(Gtk.Window):
 	#on preferences
 	def on_open_pref(self, padding):
 		self.check_iterations = Gtk.SpinButton()
-		self.check_iterations.set_adjustment(Gtk.Adjustment(self.iterations, 1, 20, 1, 10, 0))
+		self.check_iterations.set_adjustment(Gtk.Adjustment(self.iterations, 1, sys.float_info.max, 1, 10, 0))
 		
 		self.check_remove = Gtk.CheckButton(label=_("Remove files when shredded"))
 		self.check_remove.set_active(self.remove)

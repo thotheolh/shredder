@@ -35,7 +35,8 @@ elif os.environ.get('GNOME_DESKTOP_SESSION_ID'):
 elif os.environ.get('XDG_CURRENT_DESKTOP') == 'LXDE':
     desktop_environment = 'LXDE'
     print 'Desktop is ',desktop_environment
-    mainwin = UI()
+    from gtkGUI2 import *
+    mainwin = gtkGUI2() # Runs under Gnome 2 env using gtkGUI2.py
 else:
     try:
         info = getoutput('xprop -root _DT_SAVE_MODE')
