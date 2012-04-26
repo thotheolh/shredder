@@ -65,12 +65,8 @@ class gtk3(Gtk.Window):
                                 <menuitem action ='HelpAbout' />
                         </menu>
                 </menubar>
-		<toolbar name='ToolBar'>
-			<toolitem action='FileFile' />
- 			<toolitem action = 'FileFolder' />
-		</toolbar>
                 </ui>
-                """
+				"""
 		
                 self.menumanager = Gtk.UIManager()
                 self.menumanager.add_ui_from_string(self.menuxml)
@@ -102,9 +98,32 @@ class gtk3(Gtk.Window):
                 
                 #The menu
                 self.menu = self.menumanager.get_widget("/MenuBar")
+        
+        #toolbar        
+		self.toolbar = Gtk.Toolbar()
+		self.toolbar.set_style(Gtk.ToolbarStyle.TEXT)
+		
+		#toolbuttons
+		self.shred = Gtk.ToolButton()
+		self.shred.set_label("Shred files")
+		self.shred.connect("clicked", self.shred_all)
+		
+		self.trash = Gtk.ToolButton()
+		self.trash.set_label("Add trash")
+		self.trash.connect("clicked", self.sidelist_add_trash)
 
-		# The toolbar
-		self.toolbar = self.menumanager.get_widget("/ToolBar")
+		self.remove = Gtk.ToolButton()
+		self.remove.set_label("Remove item")
+		self.remove.connect("clicked", self.clear_selected)
+		
+		self.removeall = Gtk.ToolButton()
+		self.removeall.set_label("Remove all")
+		self.removeall.connect("clicked", self.clear_treeview)
+		
+		self.toolbar.insert(self.removeall, 0)
+		self.toolbar.insert(self.remove, 0)
+		self.toolbar.insert(self.trash, 0)
+		self.toolbar.insert(self.shred, 0)
 		
 		# Tree showing the files, and associated objects
 		self.sidelist = Gtk.TreeView()
@@ -121,55 +140,6 @@ class gtk3(Gtk.Window):
 		self.sidelist.connect("drag_data_get", self.drag_data_get_data)
 		self.sidelist.connect("drag_data_received", self.drag_data_received_data)
 		self.sidelist.append_column(self.sidelist_title)
-			
-		#A place for drag and drop, currently not functional (Tay fix!)
-		#self.dnd_area = Gtk.Label()
-		#self.dnd_area.set_label(_("Drag files here to add them"))
-		#self.dnd_area.drag_dest_set(Gtk.DestDefaults.ALL, [], Gdk.DragAction.COPY)
-		#self.dnd_area.connect("drag-data-received", self.on_drag_data)
-		
-		# Button to shred everything
-		self.shred = Gtk.Button(_("Shred Files"))
-		self.shred.connect("clicked", self.shred_all)
-	
-		# Button to add trash
-		self.trash = Gtk.Button(_("Shred Trash"))
-		self.trash.connect("clicked", self.sidelist_add_trash)
-
-		# Button to add files for shredding
-		self.addfile = Gtk.Button(_("Add File"))
-		self.addfile.connect("clicked", self.on_open_file)
-
-		# Button to add folder for shredding
-		self.addfolder = Gtk.Button(_("Add Folder"))
-		self.addfolder.connect("clicked", self.on_open_folder)
-
-		# Button to remove selected item
-		self.remove = Gtk.Button(_("Remove Item"))
-		self.remove.connect("clicked", self.clear_selected)
-
-		# Button to remove all items in tree
-		self.removeall = Gtk.Button(_("Clear All Items"))
-		self.removeall.connect("clicked", self.clear_treeview)
-		
-		#A Gtk.Button to hold necessary buttons
-		self.controlpanel = Gtk.HBox(orientation = Gtk.Orientation.HORIZONTAL)
-		self.controlpanel.pack_end(self.shred, False, False, 0)
-		self.controlpanel.pack_end(self.addfolder, False, False, 0)
-		self.controlpanel.pack_end(self.addfile, False, False, 0)
-		self.controlpanel.pack_end(self.remove, False, False, 0)
-		self.controlpanel.pack_end(self.removeall, False, False, 0)
-		self.controlpanel.pack_end(self.trash, False, False, 0)
-		
-		#A Gtk.Box to hold the controlpanel and dnd_area
-		#self.rightbox = Gtk.VBox(orientation = Gtk.Orientation.VERTICAL)
-		#self.rightbox.pack_start(self.dnd_area, True, True, 0)
-		#self.rightbox.pack_start(self.controlpanel, False, False, 0)
-		
-		#A Gtk.Box to hold the sidelist and any future widgets
-		self.box = Gtk.VBox(orientation = Gtk.Orientation.VERTICAL)
-		self.box.pack_start(self.sidelist, True, True, 0)		
-		self.box.pack_start(self.controlpanel, False, False, 10)
 		
 		#An About Dialog, where the developers get to show off.
 		#If you're a contributor, please add yourself here.
@@ -195,10 +165,7 @@ class gtk3(Gtk.Window):
 		#the main box for the window
 		self.mainbox = Gtk.HBox()
 		self.mainbox.set_orientation(Gtk.Orientation.HORIZONTAL)
-		#self.mainbox.pack_start(self.leftbox, True, True, 5)
-		#self.mainbox.pack_start(self.main_sep, False, True, 5)
-		#self.mainbox.pack_start(self.rightbox, True, True, 5)
-		self.mainbox.pack_start(self.box, True, True, 5)
+		self.mainbox.pack_start(self.sidelist, True, True, 5)
 		
 		#include mainbox and menu
 		self.masterbox = Gtk.VBox()
