@@ -108,9 +108,9 @@ class gtk3(Gtk.Window):
 		
 		self.addfile = Gtk.ToolButton()
 		self.addfile.set_label("Add File")
-		'''self.addfileimg = Gtk.Image() #Failed attempt to add icon for ToolButton
+		self.addfileimg = Gtk.Image()
             	self.addfileimg.set_from_file(self.get_resource("img/file.png"))
-		self.addfile.set_icon_widget(self.addfileimg)'''
+		self.addfile.set_icon_widget(self.addfileimg)
 		self.addfile.connect("clicked", self.on_open_file)
 
 		self.addfolder = Gtk.ToolButton()

@@ -72,7 +72,7 @@ if importStatus:
             ## Buttons
             self.shredbtn = gtk.Button()
             self.shredbtn.connect("clicked", self.do_shred, None)
-            self.settingsbtn = gtk.Button("Save Preferences")
+            self.settingsbtn = gtk.Button("Save Settings")
             self.settingsbtn.connect("clicked", self.do_shred, None)
 
             ## Spin Buttons
@@ -178,7 +178,7 @@ if importStatus:
             
             # Prepare tabs
             self.tabs.append_page(self.vbox, gtk.Label("File Shredding"))          
-            self.tabs.append_page(self.settingsbox, gtk.Label("Preferences"))
+            self.tabs.append_page(self.settingsbox, gtk.Label("Settings"))
 
             # Overall VBox
             self.mainbox = gtk.VBox(homogeneous=False, spacing=0)
