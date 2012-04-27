@@ -92,14 +92,21 @@ if importStatus:
             self.fileimg.set_from_file(get_resource("img/file.png"))
 
             # Folderchooser image
-
             self.folderimg = gtk.Image()
             self.folderimg.set_from_file(get_resource("img/folder.png"))
 
             # Trash image
-
             self.trashimg = gtk.Image()
             self.trashimg.set_from_file(get_resource("img/trash.png"))
+
+            # Remove image
+            self.rmimg = gtk.Image()
+            self.rmimg.set_from_file(get_resource("img/remove.png"))
+
+            # Clear image
+            self.clrimg = gtk.Image()
+            self.clrimg.set_from_file(get_resource("img/clear.png"))
+            
 
             ## Check Boxes
             self.zero = gtk.CheckButton(label=None)
@@ -128,8 +135,8 @@ if importStatus:
             self.toolbar.append_item("Add File", "Choose a file","Private", self.fileimg, self.get_filechooser_callback)
             self.toolbar.append_item("Add Folder", "Choose a folder","Private", self.folderimg, self.get_folderchooser_callback)
             self.toolbar.append_item("Shred Trash", "Shred Trash bin","Private", self.trashimg, self.shred_trash)
-            self.toolbar.append_item("Remove File/Folder", "Remove file/folder from shredding list","Private", self.trashimg, self.clear_selected)
-            self.toolbar.append_item("Clear List", "Clear shredding list","Private", self.trashimg, self.clear_treeview)
+            self.toolbar.append_item("Remove File/Folder", "Remove file/folder from shredding list","Private", self.rmimg, self.clear_selected)
+            self.toolbar.append_item("Clear List", "Clear shredding list","Private", self.clrimg, self.clear_treeview)
 
             ## Settings
             self.settingsbox = gtk.VBox(homogeneous=False, spacing=0)
