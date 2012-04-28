@@ -36,7 +36,21 @@ if importStatus:
             ('text/plain', 0, 1),
             ('TEXT', 0, 2),
             ('STRING', 0, 3)]
-        tab_mode = True # True - present in tab. False - present in window. Default is tab (True).
+        tab_mode = False # True - present in tab. False - present in window. Default is False.
+        is_remove = False # True - removes shredded item. False - retains shredded item. Default is False.
+        is_zero = True # True - zero shredded item. False - do not zero shredded item. Default is True.
+
+        license = "This program is free software; you can redistribute it and/or\n\
+        modify it under the terms of the GNU General Public License\n\
+        as published by the Free Software Foundation; either version 2\n\
+        of the License, or (at your option) any later version.\n\
+        This program is distributed in the hope that it will be useful,\n\
+        but WITHOUT ANY WARRANTY; without even the implied warranty of\n\
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n\
+        GNU General Public License for more details.\n\
+        You should have received a copy of the GNU General Public License\n\
+        along with this program; if not, write to the Free Software\n\
+        Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA."
 
         def __init__(self):
             print "Starting Gnome 2 Interface"
@@ -72,8 +86,6 @@ if importStatus:
             ## Buttons
             self.shredbtn = gtk.Button()
             self.shredbtn.connect("clicked", self.do_shred, None)
-            self.settingsbtn = gtk.Button("Save Preferences")
-            self.settingsbtn.connect("clicked", self.do_shred, None)
 
             ## Spin Buttons
             self.adjustments = gtk.Adjustment(self.iterations,1,sys.float_info.max, 1, 10, 0)
@@ -106,6 +118,10 @@ if importStatus:
             # Clear image
             self.clrimg = gtk.Image()
             self.clrimg.set_from_file(get_resource("img/clear.png"))
+
+            # About image
+            self.abtimg = gtk.Image()
+            self.abtimg.set_from_file(get_resource("img/about.png"))
             
 
             ## Check Boxes
@@ -132,31 +148,23 @@ if importStatus:
             self.shredtooltip.set_tip(self.shredbtn, "Begin Shredding Files")
 
             ## Adding items to toolbar
-            self.toolbar.append_item("Add File", "Choose a file","Private", self.fileimg, self.get_filechooser_callback)
-            self.toolbar.append_item("Add Folder", "Choose a folder","Private", self.folderimg, self.get_folderchooser_callback)
-            self.toolbar.append_item("Shred Trash", "Shred Trash bin","Private", self.trashimg, self.shred_trash)
-            self.toolbar.append_item("Remove File/Folder", "Remove file/folder from shredding list","Private", self.rmimg, self.clear_selected)
-            self.toolbar.append_item("Clear List", "Clear shredding list","Private", self.clrimg, self.clear_treeview)
+            self.toolbar.append_item("Add File", "Choose a file", "Private", self.fileimg, self.get_filechooser_callback)
+            self.toolbar.append_item("Add Folder", "Choose a folder", "Private", self.folderimg, self.get_folderchooser_callback)
+            self.toolbar.append_item("Shred Trash", "Shred Trash bin", "Private", self.trashimg, self.shred_trash)
+            self.toolbar.append_item("Remove File/Folder", "Remove file/folder from shredding list", "Private", self.rmimg, self.clear_selected)
+            self.toolbar.append_item("Clear List", "Clear shredding list", "Private", self.clrimg, self.clear_treeview)
+            if self.tab_mode == False:
+                self.toolbar.append_item("Preferences","Shredder settings and preferences", "Private", None, self.on_open_pref)
+            self.toolbar.append_item("About", "About Shredder", "Private", self.abtimg, self.about)
 
-            ## Settings
-            self.settingsbox = gtk.VBox(homogeneous=False, spacing=0)
-            self.iterbox = gtk.HBox(homogeneous=False, spacing=0)
-            self.zerobox = gtk.HBox(homogeneous=False, spacing=0)
-            self.rmbox = gtk.HBox(homogeneous=False, spacing=0)
-            self.savesettingsbox = gtk.HBox(homogeneous=False, spacing=0)
-            
-            self.iterbox.pack_start(self.iterationlbl, expand=False, fill=False, padding=5)
-            self.iterbox.pack_start(self.check_iterations, expand=False, fill=True, padding=0)
-            self.zerobox.pack_start(self.zerolbl, expand=False, fill=False, padding=5)
-            self.zerobox.pack_start(self.zero, expand=False, fill=False, padding=0)
-            self.rmbox.pack_start(self.removelbl, expand=False, fill=False, padding=5)
-            self.rmbox.pack_start(self.remove, expand=False, fill=False, padding=0)
-            self.savesettingsbox.pack_end(self.settingsbtn, expand=False, fill=False, padding=5)
-
-            self.settingsbox.pack_start(self.iterbox, expand=False, fill=False, padding=5)
-            self.settingsbox.pack_start(self.zerobox, expand=False, fill=False, padding=5)
-            self.settingsbox.pack_start(self.rmbox, expand=False, fill=False, padding=5)
-            self.settingsbox.pack_end(self.savesettingsbox, expand=False, fill=True, padding=5)
+            ## An About Dialog, where the developers get to show off.
+		    #  If you're a contributor, please add yourself here.
+            self.about_dialog = gtk.AboutDialog()
+            self.about_dialog.set_program_name("Shredder")
+            self.about_dialog.set_website("http://code.google.com/p/shredder")
+            self.about_dialog.set_license(self.license)
+            self.about_dialog.set_authors([ "Tay Thotheolh <twzgerald@gmail.com>", "Michael Rawson <michaelrawson76@gmail.com>"])
+            self.about_dialog.set_version(self.version)
 
             ## Progress bar
             self.progress = gtk.ProgressBar()
@@ -177,12 +185,16 @@ if importStatus:
             self.shredbox.pack_end(self.shredbtn, expand=False, fill=False, padding=5)
             
             # Prepare tabs
-            self.tabs.append_page(self.vbox, gtk.Label("File Shredding"))          
-            self.tabs.append_page(self.settingsbox, gtk.Label("Preferences"))
+            if self.tab_mode == True:
+                self.tabs.append_page(self.vbox, gtk.Label("File Shredding"))          
+                self.tabs.append_page(self.get_settings_box(), gtk.Label("Preferences"))
 
             # Overall VBox
             self.mainbox = gtk.VBox(homogeneous=False, spacing=0)
-            self.mainbox.pack_start(self.tabs, expand=True, fill=True, padding=0)
+            if self.tab_mode == True:
+                self.mainbox.pack_start(self.tabs, expand=True, fill=True, padding=0)
+            else:
+                self.mainbox.pack_start(self.vbox, expand=True, fill=True, padding=0)
             self.mainbox.pack_start(self.shredbox, expand=False, fill=False, padding=5)
             self.statusbox = gtk.HBox(homogeneous=False, spacing=0)
             self.statusbox.pack_start(self.statuslbl, expand=False, fill=False, padding=0)
@@ -211,6 +223,11 @@ if importStatus:
         ## Closes main window
         def destroy(self, widget, data=None):
             return gtk.main_quit()
+
+        ## Calls up about window
+        def about(self, padding):
+		    self.about_dialog.run()
+		    self.about_dialog.hide()
 
         ## Output status
         ## Need to upgrade for status label use
@@ -247,6 +264,43 @@ if importStatus:
             elif response == gtk.RESPONSE_CANCEL:
                 self.chooser.destroy()
             self.chooser.destroy()
+
+        def get_settings_box(self):
+            self.settingsbox = gtk.VBox(homogeneous=False, spacing=0)
+            self.iterbox = gtk.HBox(homogeneous=False, spacing=0)
+            self.zerobox = gtk.HBox(homogeneous=False, spacing=0)
+            self.rmbox = gtk.HBox(homogeneous=False, spacing=0)
+            self.savesettingsbox = gtk.HBox(homogeneous=False, spacing=0)
+            self.settingsbtn = gtk.Button("Save Preferences")
+            self.settingsbtn.connect("clicked", self.do_shred, None)
+            
+            self.iterbox.pack_start(self.iterationlbl, expand=False, fill=False, padding=5)
+            self.iterbox.pack_start(self.check_iterations, expand=False, fill=True, padding=0)
+            self.zerobox.pack_start(self.zerolbl, expand=False, fill=False, padding=5)
+            self.zerobox.pack_start(self.zero, expand=False, fill=False, padding=0)
+            self.rmbox.pack_start(self.removelbl, expand=False, fill=False, padding=5)
+            self.rmbox.pack_start(self.remove, expand=False, fill=False, padding=0)
+            self.savesettingsbox.pack_end(self.settingsbtn, expand=False, fill=False, padding=5)
+
+            self.settingsbox.pack_start(self.iterbox, expand=False, fill=False, padding=5)
+            self.settingsbox.pack_start(self.zerobox, expand=False, fill=False, padding=5)
+            self.settingsbox.pack_start(self.rmbox, expand=False, fill=False, padding=5)
+            self.settingsbox.pack_end(self.savesettingsbox, expand=False, fill=True, padding=5)
+            return self.settingsbox
+
+        def on_open_pref(self, widget, data=None):
+            self.pref_window = gtk.Window()
+            self.pref_window.set_default_size(250, 300)
+            self.pref_window.set_title("Preferences")
+            self.pref_window.connect("destroy", self.on_pref_quit)
+            self.pref_window.add(self.get_settings_box())
+            self.pref_window.show_all()
+
+        def on_pref_quit(self, padding):
+            self.iterations = self.check_iterations.get_value()
+            self.is_remove = self.remove.get_active()
+            self.is_zero = self.zero.get_active()
+            self.pref_window.destroy()
 
         ## Disables widget
         def disable_widgets(self):
