@@ -4,6 +4,8 @@ import sys
 import os
 import urllib
 from shreddable import shreddable
+from settings import settings
+from util import util
 
 importStatus = False
 
@@ -29,16 +31,13 @@ if importStatus:
         chooser = None
         dnd_list = [ ( 'text/uri-list', 0, 80 ) ]
         cwd = os.getcwd()
-        version = "2.0 (Pre-Alpha)"
-        iterations = 5
         TARGETS = [
             ('MY_TREE_MODEL_ROW', gtk.TARGET_SAME_WIDGET, 0),
             ('text/plain', 0, 1),
             ('TEXT', 0, 2),
             ('STRING', 0, 3)]
         tab_mode = False # True - present in tab. False - present in window. Default is False.
-        is_remove = False # True - removes shredded item. False - retains shredded item. Default is False.
-        is_zero = True # True - zero shredded item. False - do not zero shredded item. Default is True.
+        settings = settings()
 
         license = "This program is free software; you can redistribute it and/or\n\
         modify it under the terms of the GNU General Public License\n\
@@ -62,10 +61,11 @@ if importStatus:
             ## Main Window
             self.window = gtk.Window(gtk.WINDOW_TOPLEVEL)
             self.window.set_border_width(10)
+            self.version = self.settings.get_version()
             self.window.set_title("Shredder " + self.version)
             self.window.set_default_size(650, 400)
             self.window.connect("destroy", self.destroy)
-            self.window.set_icon_from_file(get_resource("img/shredder256.png"))
+            self.window.set_icon_from_file(util().get_resource("img/shredder256.png"))
 
             ## Tabs Panel
             self.tabs = gtk.Notebook()
@@ -88,7 +88,7 @@ if importStatus:
             self.shredbtn.connect("clicked", self.do_shred, None)
 
             ## Spin Buttons
-            self.adjustments = gtk.Adjustment(self.iterations,1,sys.float_info.max, 1, 10, 0)
+            self.adjustments = gtk.Adjustment(int(self.settings.get_shred_iterations()),1,sys.float_info.max, 1, 10, 0)
             self.check_iterations = gtk.SpinButton()
             self.check_iterations.set_adjustment(self.adjustments)
 
@@ -96,39 +96,39 @@ if importStatus:
 
             # Shred image
             self.shredimg = gtk.Image()
-            self.shredimg.set_from_file(get_resource("img/shred.png"))
+            self.shredimg.set_from_file(util().get_resource("img/shred.png"))
             self.shredbtn.add(self.shredimg)
             
             # Filechooser image
             self.fileimg = gtk.Image()
-            self.fileimg.set_from_file(get_resource("img/file.png"))
+            self.fileimg.set_from_file(util().get_resource("img/file.png"))
 
             # Folderchooser image
             self.folderimg = gtk.Image()
-            self.folderimg.set_from_file(get_resource("img/folder.png"))
+            self.folderimg.set_from_file(util().get_resource("img/folder.png"))
 
             # Trash image
             self.trashimg = gtk.Image()
-            self.trashimg.set_from_file(get_resource("img/trash.png"))
+            self.trashimg.set_from_file(util().get_resource("img/trash.png"))
 
             # Remove image
             self.rmimg = gtk.Image()
-            self.rmimg.set_from_file(get_resource("img/remove.png"))
+            self.rmimg.set_from_file(util().get_resource("img/remove.png"))
 
             # Clear image
             self.clrimg = gtk.Image()
-            self.clrimg.set_from_file(get_resource("img/clear.png"))
+            self.clrimg.set_from_file(util().get_resource("img/clear.png"))
 
             # About image
             self.abtimg = gtk.Image()
-            self.abtimg.set_from_file(get_resource("img/about.png"))
+            self.abtimg.set_from_file(util().get_resource("img/about.png"))
             
 
             ## Check Boxes
             self.zero = gtk.CheckButton(label=None)
-            self.zero.set_active(True)
+            self.zero.set_active(self.settings.is_zero())
             self.remove = gtk.CheckButton(label=None)
-            self.remove.set_active(False)
+            self.remove.set_active(self.settings.is_remove_shredded())
             
             ## Tree with scrolling
             self.scrolltree = gtk.ScrolledWindow()
@@ -222,6 +222,7 @@ if importStatus:
 
         ## Closes main window
         def destroy(self, widget, data=None):
+            self.settings.close_io
             return gtk.main_quit()
 
         ## Calls up about window
@@ -272,7 +273,7 @@ if importStatus:
             self.rmbox = gtk.HBox(homogeneous=False, spacing=0)
             self.savesettingsbox = gtk.HBox(homogeneous=False, spacing=0)
             self.settingsbtn = gtk.Button("Save Preferences")
-            self.settingsbtn.connect("clicked", self.do_shred, None)
+            self.settingsbtn.connect("clicked", self.do_save_prefs, None)
             
             self.iterbox.pack_start(self.iterationlbl, expand=False, fill=False, padding=5)
             self.iterbox.pack_start(self.check_iterations, expand=False, fill=True, padding=0)
@@ -419,9 +420,8 @@ if importStatus:
             self.liststore.append([item])
             return
 
-    ## Get the relative working path of the current files
-    def get_resource(rel_path):
-        dir_of_py_file = os.path.dirname(__file__)
-        rel_path_to_resource = os.path.join(dir_of_py_file, rel_path)
-        abs_path_to_resource = os.path.abspath(rel_path_to_resource)
-        return abs_path_to_resource
+        def do_save_prefs(self, widget, data=None):
+            self.settings.set_shred_iterations(self.check_iterations.get_value())
+            self.settings.set_remove_shredded(self.remove.get_active())
+            self.settings.set_zero(self.zero.get_active())
+            self.settings.commit()
