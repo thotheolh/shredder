@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 import sys, urllib, os, time, gettext
 from gi.repository import Gtk, Gdk #gtk 3(!) library.
-
 from shreddable import shreddable #shreddable class
+from settings import settings
+from util import util
 
 t = gettext.translation('shredder', 'locale', fallback=True)
 _ = t.ugettext
@@ -23,6 +24,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.\
 version = "2.0 (Pre-Alpha)"
 
 class gtk3(Gtk.Window):
+
 	def __init__(self): # Constructor
 		super(Gtk.Window, self).__init__()
 		print "Starting Gnome 3 Interface"
@@ -44,8 +46,8 @@ class gtk3(Gtk.Window):
 		self.set_default_size(650, 400)
 		self.set_border_width(10)
 		self.set_title(_("Shredder " + version))
-		self.connect("destroy", self.on_quit)
-		self.set_icon_from_file(self.get_resource("img/shredder256.png"))
+		self.connect("destroy", self.on_quit)	
+		self.set_icon_from_file(util().get_resource("img/shredder256.png"))
 
 		#An action group for the menus
                 self.actions = Gtk.ActionGroup("menu actions") 
@@ -108,9 +110,9 @@ class gtk3(Gtk.Window):
 		
 		self.addfile = Gtk.ToolButton()
 		self.addfile.set_label("Add File")
-		self.addfileimg = Gtk.Image()
+		'''self.addfileimg = Gtk.Image() #Failed attempt to add icon for ToolButton
             	self.addfileimg.set_from_file(self.get_resource("img/file.png"))
-		self.addfile.set_icon_widget(self.addfileimg)
+		self.addfile.set_icon_widget(self.addfileimg)'''
 		self.addfile.connect("clicked", self.on_open_file)
 
 		self.addfolder = Gtk.ToolButton()
@@ -170,7 +172,7 @@ class gtk3(Gtk.Window):
 		self.shredbtn = Gtk.Button()
 		self.shredbtn.connect("clicked", self.shred_all, None)
 		self.shredimg = Gtk.Image()
-		self.shredimg.set_from_file(self.get_resource("img/shred.png"))
+		self.shredimg.set_from_file(util()get_resource("img/shred.png"))
 		self.shredbtn.add(self.shredimg)
 		self.shredbox = Gtk.HBox()		
 		self.shredbox.set_orientation(Gtk.Orientation.HORIZONTAL)
@@ -353,13 +355,6 @@ class gtk3(Gtk.Window):
 		self.sidelist_model = Gtk.ListStore(str)
 		self.sidelist.set_model(self.sidelist_model)
 		return
-
-    	## Get the relative working path of the current files
-	def get_resource(self, rel_path):
-		dir_of_py_file = os.path.dirname(__file__)
-		rel_path_to_resource = os.path.join(dir_of_py_file, rel_path)
-		abs_path_to_resource = os.path.abspath(rel_path_to_resource)
-		return abs_path_to_resource
 
 		
 	
