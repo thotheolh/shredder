@@ -31,9 +31,7 @@ class gtk3(Gtk.Window):
 		
 		self.filenames = []
 		self.shred_list = []
-		self.iterations = 1
-		self.remove = False
-		self.zero = False
+		self.settings = settings()
 		self.dialog_response = Gtk.ResponseType.CANCEL
 
 		self.TARGETS = [('MY_TREE_MODEL_ROW',Gtk.TargetFlags.SAME_WIDGET,0),
@@ -172,7 +170,7 @@ class gtk3(Gtk.Window):
 		self.shredbtn = Gtk.Button()
 		self.shredbtn.connect("clicked", self.shred_all, None)
 		self.shredimg = Gtk.Image()
-		self.shredimg.set_from_file(util()get_resource("img/shred.png"))
+		self.shredimg.set_from_file(util().get_resource("img/shred.png"))
 		self.shredbtn.add(self.shredimg)
 		self.shredbox = Gtk.HBox()		
 		self.shredbox.set_orientation(Gtk.Orientation.HORIZONTAL)
@@ -216,9 +214,10 @@ class gtk3(Gtk.Window):
 		Gtk.main_quit()
 		
 	def on_pref_quit(self, padding):
-		self.iterations = self.check_iterations.get_value()
-		self.remove = self.check_remove.get_active()
-		self.zero = self.check_zero.get_active()
+		self.settings.set_shred_iterations(self.check_iterations.get_value())
+		self.settings.set_remove_shredded(self.check_remove.get_active())
+		self.settings.set_zero(self.check_zero.get_active())
+		self.settings.commit()
 		self.pref_window.destroy()
 		
 	#on opening file
@@ -228,7 +227,7 @@ class gtk3(Gtk.Window):
 		response = dialog.run()
         
 		if response == Gtk.ResponseType.OK:
-			self.sidelist_add_item(shreddable(dialog.get_filename(), self.iterations, self.zero, self.remove, self))
+			self.sidelist_add_item(shreddable(dialog.get_filename(), self.settings.get_shred_iterations(), self.settings.is_zero(), self.settings.is_remove_shredded(), self))
 			
 		dialog.destroy()
 		
@@ -246,13 +245,13 @@ class gtk3(Gtk.Window):
 	#on preferences
 	def on_open_pref(self, padding):
 		self.check_iterations = Gtk.SpinButton()
-		self.check_iterations.set_adjustment(Gtk.Adjustment(self.iterations, 1, sys.float_info.max, 1, 10, 0))
+		self.check_iterations.set_adjustment(Gtk.Adjustment(int(self.settings.get_shred_iterations()), 1, sys.float_info.max, 1, 10, 0))
 		
 		self.check_remove = Gtk.CheckButton(label=_("Remove files when shredded"))
-		self.check_remove.set_active(self.remove)
+		self.check_remove.set_active(self.settings.is_remove_shredded())
 		
 		self.check_zero = Gtk.CheckButton(label=_("Write files over with zeros"))
-		self.check_zero.set_active(self.zero)
+		self.check_zero.set_active(self.settings.is_zero())
 		
 		self.pref_close = Gtk.Button(stock=Gtk.STOCK_CLOSE)
 		self.pref_close.connect("clicked", self.on_pref_quit)
@@ -284,7 +283,7 @@ class gtk3(Gtk.Window):
 	def sidelist_add_trash(self, button):
 		home = os.getenv("HOME")
 		trash = home + "/.local/share/Trash/files"
-		trashshred = shreddable(trash, self.iterations, self.zero, self.remove, self)
+		trashshred = shreddable(trash, self.settings.get_shred_iterations(), self.settings.is_zero(), self.settings.is_remove_shredded(), self)
 		trashshred.filename = trash
 		self.sidelist_add_item(trashshred)
 		self.trash.set_sensitive(False)
