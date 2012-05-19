@@ -28,7 +28,7 @@ class shreddable():
         if (self.gui != None):
 
            # Displays on the GUI output console the files that are being shredded at the moment
-           self.gui.insertText(_("Processing file ")+filename)
+           self.gui.set_shred_status(_("Processing file: ")+filename)
 
         os.system(command)
 
@@ -50,11 +50,12 @@ class shreddable():
             if (self.gui != None):
 
                 # Displays on the GUI output console the files that are being shredded at the moment
-                self.gui.insertText("Warning! - "+self.filename+" does NOT EXIST! Please re-select a valid file")
+                self.gui.set_general_status("Warning! - "+self.filename+" does NOT EXIST! Please re-select a valid file")
             else:
                 sys.exit("ERROR: filename does not exist-developers-check implementation of filename section")
 
         if (os.path.isdir(self.filename) == True):
+            self.set_shred_status(_("Entering folder: ")+self.filename)		
             self.rshred()
 
         else:

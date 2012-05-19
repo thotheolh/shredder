@@ -58,11 +58,10 @@ class shreddable():
             self.gui.set_shred_status(_("Entering folder: ")+self.filename)		
             self.rshred()
             self.gui.inc_count()
-            self.gui.set_shred_status(_("Done with: ")+self.filename)
+
         else:
             self.shred(self.filename)
             self.gui.inc_count()
-            self.gui.set_shred_status(_("Done with: ")+self.filename)
 
 
 

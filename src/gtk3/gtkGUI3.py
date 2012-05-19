@@ -302,9 +302,16 @@ class gtk3(Gtk.Window):
 		self.progress.set_fraction(0)
 		self.status.push(0, _("Idle"))
 	
-	#output text
-	def insertText(self, output):
+	#Set general status message.
+	def set_general_status(self, output):
 		self.progress.pulse()
+		self.status.push(01, output)
+	
+	# Set shredding related status message.
+	def set_shred_status(self, output):
+		self.progress.pulse()
+		if self.settings.is_remove_shredded():
+		output = output + "/" + len(self.sidelist_model) + " Done."
 		self.status.push(01, output)
 		
 		#nasty hack to give the thread control back to Gtk temporarily so the interface doesn't freeze while

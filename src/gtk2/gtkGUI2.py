@@ -19,13 +19,12 @@ except ImportError:
     print "PyGTK module does not exist. Can't launch GUI !"
     print "Please download and install GTK and PyGTK."
     importStatus = False
-
-target = shreddable(None,None,None,None,None)
     
 if importStatus:
 
     class gtkGUI2():
 
+	count = 0
         output = None
         filenametf = None
         chooser = None
@@ -227,13 +226,21 @@ if importStatus:
 
         ## Calls up about window
         def about(self, padding):
-		    self.about_dialog.run()
-		    self.about_dialog.hide()
+            self.about_dialog.run()
+            self.about_dialog.hide()
+
+	## Increment count counter
+	def inc_count(self):
+            self.count = self.count + 1
 
         ## Output status
         ## Need to upgrade for status label use
-        def set_status(self, text):
-            statuslbl.set_text(text)
+        def set_general_status(self, text):
+            self.statuslbl.set_text(text)
+
+	def set_shred_status(self, text):
+            text = text + "   | " + str(self.count) + " / " + str(len(self.liststore)) + " Done."
+            self.statuslbl.set_text(text)
 
         ## Trash bin selected for secure wiping
         def shred_trash(self, widget, data=None):
@@ -332,51 +339,40 @@ if importStatus:
 
         ## Receives the data that is dropped into the tree after the drag
         def drag_data_received_data(self, treeview, context, x, y, selection, info, etime):
-            model = treeview.get_model()
             data = selection.data
-            data = self.cleanse_drag_input(data)
-            model.append([data])
+            lst = data.split('\r\n')
+            if isinstance(lst, list):
+                for element in lst:
+                    self.tree_add_item(self.cleanse_drag_input(element))
+            else:
+                self.tree_add_item(self.cleanse_drag_input(data))
             if context.action == gtk.gdk.ACTION_MOVE:
                 context.finish(True, True, etime)
             return
 
         ## Shred !!!
         def do_shred(self, widget, data=None):
-            filename = self.filenametf.get_text()
-            iter_num = self.itertf.get_text()
-            is_zero = self.zero.get_active()
-            is_remove = self.remove.get_active()
-            ## Check if the iteration is a digit number, if not treat as invalid iterations
-            if iter_num.isdigit():
+            for element in self.liststore:
+                filename = str(element[0])
+                iter_num = self.settings.get_shred_iterations()
+                is_zero = self.settings.is_zero()
+                is_remove = self.settings.is_remove_shredded()
+                ## Check if the iteration is a digit number, if not treat as invalid iterations
                 if iter_num > 0:
+                    # self.disable_widgets() #requires updating
                     # Proceed shredding operations
-                    # target.iterations = iter_num
-                    # target.filename = filename
-                    # target.zero = is_zero
-                    # target.remove = is_remove
-                    # target.gui = self
-                    self.insertText("Target File: "+filename+"\nIterations: "+iter_num+", Zero-ing: "+str(is_zero)+", Remove: "+str(is_remove)+".\n")
-                    self.insertText("Here we go! Pray that it doesn't take anything bad out!\n")
-                    # Begin shredding. Widgets disabled to prevent interruption in due process.
-                    self.disable_widgets()
+                    target = shreddable(filename, iter_num, is_zero, is_remove, self)
                     target.destroy()
-                    self.enable_widgets()
-                    self.filenametf.set_text("")
-                    # Finish shredding
-                    self.insertText("Done with all the shredding! \nYou may proceed to exit or shred more stuff again.\n==========\n")
+                    # self.enable_widgets() #requires updating
+                    # Remove shredded row
+                    self.liststore.remove(element.iter)
                 else:
                     iter_warn_msg = "Iteration field only accepts positive integer numbers.\nPlease try again."
                     self.dialog = gtk.MessageDialog(None, gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_WARNING, gtk.BUTTONS_CLOSE, iter_warn_msg)
                     self.dialog.run()
                     self.dialog.destroy()
-                    self.itertf.set_text("100")
-            else:
-                # Throws a warning dialog
-                iter_warn_msg = "Iteration field only accepts positive integer numbers.\nPlease try again."
-                self.dialog = gtk.MessageDialog(None, gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_WARNING, gtk.BUTTONS_CLOSE, iter_warn_msg)
-                self.dialog.run()
-                self.dialog.destroy()
-                self.itertf.set_text("100")
+            self.count = 0 # Reset count to 0 for next shredding operations.
+            print "Overall count: " + str(self.count)
 
         def on_drag_data_received(widget, context, x, y, selection, target_type, timestamp):
             if target_type == 80:
@@ -402,23 +398,29 @@ if importStatus:
             path = path.strip('\r\n\x00') # remove \r\n and NULL
             return path
 
+        ## Cleanse tree of duplicated items.
+        def is_duplicate_tree_item(self, item):
+            for element in self.liststore:
+                if str(element[0]) == str(item):
+                    return True
+            return False
+
         ## Clears a selected item from tree
         def clear_selected(self, button):
-		    selection = self.tree.get_selection()
-		    model, iter = selection.get_selected()
-		    if iter:
-			    model.remove(iter)
-		    return
+            selection = self.tree.get_selection()
+            model, iter = selection.get_selected()
+            if iter:
+                model.remove(iter)
 
         ## Clears the entire tree
         def clear_treeview(self, button):
-		    self.liststore.clear()
-		    return
+            self.liststore.clear()
 
         #add a generic item to the list
         def tree_add_item(self, item):
-            self.liststore.append([item])
-            return
+            if self.is_duplicate_tree_item(item) == False:
+                if not item  == "":
+                    self.liststore.append([item])
 
         def do_save_prefs(self, widget, data=None):
             self.settings.set_shred_iterations(self.check_iterations.get_value())
