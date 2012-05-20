@@ -241,6 +241,8 @@ if importStatus:
 	def set_shred_status(self, text):
             text = text + "   | " + str(self.count) + " / " + str(len(self.liststore)) + " Done."
             self.statuslbl.set_text(text)
+            while(gtk.events_pending()):
+		gtk.main_iteration()
 
         ## Trash bin selected for secure wiping
         def shred_trash(self, widget, data=None):
