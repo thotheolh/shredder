@@ -24,7 +24,8 @@ if importStatus:
 
     class gtkGUI2():
 
-	count = 0
+        count = 0
+        ttlcount = 0
         output = None
         filenametf = None
         chooser = None
@@ -78,6 +79,7 @@ if importStatus:
             
             ## Labels
             self.statuslbl = gtk.Label("Idle")
+            self.statuslbl.set_line_wrap(True)
             self.iterationlbl = gtk.Label("Shred Iterations: ")
             self.zerolbl = gtk.Label("Zero-ing: ")
             self.removelbl = gtk.Label("Remove: ")
@@ -118,6 +120,10 @@ if importStatus:
             self.clrimg = gtk.Image()
             self.clrimg.set_from_file(util().get_resource("img/clear.png"))
 
+            # Preferences image
+            self.prefimg = gtk.Image()
+            self.prefimg.set_from_file(util().get_resource("img/preferences.png"))
+
             # About image
             self.abtimg = gtk.Image()
             self.abtimg.set_from_file(util().get_resource("img/about.png"))
@@ -153,7 +159,7 @@ if importStatus:
             self.toolbar.append_item("Remove File/Folder", "Remove file/folder from shredding list", "Private", self.rmimg, self.clear_selected)
             self.toolbar.append_item("Clear List", "Clear shredding list", "Private", self.clrimg, self.clear_treeview)
             if self.tab_mode == False:
-                self.toolbar.append_item("Preferences","Shredder settings and preferences", "Private", None, self.on_open_pref)
+                self.toolbar.append_item("Preferences","Shredder settings and preferences", "Private", self.prefimg, self.on_open_pref)
             self.toolbar.append_item("About", "About Shredder", "Private", self.abtimg, self.about)
 
             ## An About Dialog, where the developers get to show off.
@@ -229,8 +235,8 @@ if importStatus:
             self.about_dialog.run()
             self.about_dialog.hide()
 
-	## Increment count counter
-	def inc_count(self):
+	    ## Increment count counter
+        def inc_count(self):
             self.count = self.count + 1
 
         ## Output status
@@ -238,11 +244,12 @@ if importStatus:
         def set_general_status(self, text):
             self.statuslbl.set_text(text)
 
-	def set_shred_status(self, text):
-            text = text + "   | " + str(self.count) + " / " + str(len(self.liststore)) + " Done."
+        def set_shred_status(self, text):
+            self.progress.set_fraction(float(self.count)/self.ttlcount)
+            text = text + "   | " + str(self.count) + " / " + str(self.ttlcount) + " Done."
             self.statuslbl.set_text(text)
             while(gtk.events_pending()):
-		gtk.main_iteration()
+		        gtk.main_iteration()
 
         ## Trash bin selected for secure wiping
         def shred_trash(self, widget, data=None):
@@ -314,22 +321,12 @@ if importStatus:
 
         ## Disables widget
         def disable_widgets(self):
-            self.filenametf.set_sensitive(False)
-            self.itertf.set_sensitive(False)
-            self.filechoosebtn.set_sensitive(False)
-            self.folderchoosebtn.set_sensitive(False)
-            self.trashbtn.set_sensitive(False)
-            self.zero.set_sensitive(False)
+            self.toolbar.set_sensitive(False)
             self.shredbtn.set_sensitive(False)
 
         ## Enables widgets
         def enable_widgets(self):
-            self.filenametf.set_sensitive(True)
-            self.itertf.set_sensitive(True)
-            self.filechoosebtn.set_sensitive(True)
-            self.folderchoosebtn.set_sensitive(True)
-            self.trashbtn.set_sensitive(True)
-            self.zero.set_sensitive(True)
+            self.toolbar.set_sensitive(True)
             self.shredbtn.set_sensitive(True)
 
         ## Get data when drag occurs inside the tree
@@ -354,6 +351,8 @@ if importStatus:
 
         ## Shred !!!
         def do_shred(self, widget, data=None):
+            self.ttlcount = len(self.liststore)
+            self.disable_widgets() #requires updating
             for element in self.liststore:
                 filename = str(element[0])
                 iter_num = self.settings.get_shred_iterations()
@@ -361,11 +360,9 @@ if importStatus:
                 is_remove = self.settings.is_remove_shredded()
                 ## Check if the iteration is a digit number, if not treat as invalid iterations
                 if iter_num > 0:
-                    # self.disable_widgets() #requires updating
                     # Proceed shredding operations
                     target = shreddable(filename, iter_num, is_zero, is_remove, self)
                     target.destroy()
-                    # self.enable_widgets() #requires updating
                     # Remove shredded row
                     self.liststore.remove(element.iter)
                 else:
@@ -373,8 +370,11 @@ if importStatus:
                     self.dialog = gtk.MessageDialog(None, gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_WARNING, gtk.BUTTONS_CLOSE, iter_warn_msg)
                     self.dialog.run()
                     self.dialog.destroy()
+            self.enable_widgets() #requires updating
+            self.set_general_status("Shredding completed. " + str(self.count) + " / " + str(self.ttlcount) + ".")
             self.count = 0 # Reset count to 0 for next shredding operations.
-            print "Overall count: " + str(self.count)
+            self.ttlcount = 0 # Reset total count to 0 for next shredding operations.
+
 
         def on_drag_data_received(widget, context, x, y, selection, target_type, timestamp):
             if target_type == 80:
