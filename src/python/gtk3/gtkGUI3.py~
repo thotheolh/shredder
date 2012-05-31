@@ -100,37 +100,40 @@ class gtk3(Gtk.Window):
                 #The menu
                 self.menu = self.menumanager.get_widget("/MenuBar")
         
-        	#toolbar        
+        	#toolbar     
 		self.toolbar = Gtk.Toolbar()
 		self.toolbar.set_style(Gtk.ToolbarStyle.TEXT)
 		
 		#toolbuttons
-		
+		Gtk.ToolItem addfileitem = Gtk.ToolItem.gtk_tool_button_new_from_stock(GTK_STOCK_OPEN);
 		self.addfile = Gtk.ToolButton()
-		self.addfile.set_label("Add File")
-		'''self.addfileimg = Gtk.Image() #Failed attempt to add icon for ToolButton
-            	self.addfileimg.set_from_file(self.get_resource("img/file.png"))
-		self.addfile.set_icon_widget(self.addfileimg)'''
+		# self.addfile.set_label("Add File")
+		self.addfile.set_icon_name("gtk-open")
 		self.addfile.connect("clicked", self.on_open_file)
 
 		self.addfolder = Gtk.ToolButton()
-		self.addfolder.set_label("Add Folder")
+		# self.addfolder.set_label("Add Folder")
+		self.addfolder.set_icon_name("gtk-open")
 		self.addfolder.connect("clicked", self.on_open_folder)
 		
 		self.trash = Gtk.ToolButton()
-		self.trash.set_label("Shred Trash")
+		# self.trash.set_label("Shred Trash")
+		self.trash.set_icon_name("user-trash")
 		self.trash.connect("clicked", self.sidelist_add_trash)
 
 		self.remove = Gtk.ToolButton()
-		self.remove.set_label("Remove File/Folder")
+		# self.remove.set_label("Remove File/Folder")
+		self.remove.set_icon_name("gtk-remove")
 		self.remove.connect("clicked", self.clear_selected)
 		
 		self.removeall = Gtk.ToolButton()
-		self.removeall.set_label("Clear List")
+		# self.removeall.set_label("Clear List")
+		self.removeall.set_icon_name("gtk-clear")
 		self.removeall.connect("clicked", self.clear_treeview)
 
 		self.prefbtn = Gtk.ToolButton()
-		self.prefbtn.set_label("Preferences")
+		# self.prefbtn.set_label("Preferences")
+		self.prefbtn.set_icon_name("gtk-preferences")
 		self.prefbtn.connect("clicked", self.on_open_pref)
 		
 		
@@ -311,8 +314,8 @@ class gtk3(Gtk.Window):
 	def set_shred_status(self, output):
 		self.progress.pulse()
 		if self.settings.is_remove_shredded():
-		output = output + "/" + len(self.sidelist_model) + "Done."
-		self.status.push(01, output)
+			output = output + "/" + len(self.sidelist_model) + " Done."
+			self.status.push(01, output)
 		
 		#nasty hack to give the thread control back to Gtk temporarily so the interface doesn't freeze while
 		#processing the files. TODO: better threading control.
