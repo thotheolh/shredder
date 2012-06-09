@@ -1,76 +1,91 @@
-//Needed, to quote the unity devs, "for ungodly stupid reasons". 
+//needed, to quote the unity devs, for ungodly stupid reasons
 #define _XOPEN_SOURCE 500
 
+#include <glib.h>
+#include <glib/gstdio.h>
+#include <gtk/gtk.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <time.h>
-#include <sys/stat.h>
 #include <ftw.h>
-#include <gtk/gtk.h>
 
-#include "preferences.h"
+#include "shredder.h"
+#include "util.h"
 
-//1KB buffer-big enough to be efficient, but not big enough to become a memory hog.
 #define BUFFER_SIZE 1024
+struct prefs* pref;
+gfloat total_files = 0;
+gfloat current_total = 0;
 
-struct preferences* prefs;
+extern gdouble progress_proportion;
+extern gchar* progress_status;
+extern guint files_left;
 
-void error(const char* message);
-void warning(const char* message);
+extern GtkListStore* file_list; 
 
-void file_shred(const char* filename) {
-	FILE* file = fopen(filename, "r+");
-	
-	//uh-oh.
-	if(file == NULL) {
-		error("Could not open file for writing");
-		return;
-	}
-	
-	//no buffering, thankyou.
-	setbuf(file, NULL);
-	
-	
-	//how big is the file? Well, go to the end, then tell me how far you are away. 
+//Low-level file shredding. Deals with individual files
+void shred_single_file(const gchar* filename) {
+
+    //check it
+    if(!g_file_test(filename, G_FILE_TEST_EXISTS)) {
+        g_critical("Non-existent file: %s", filename);
+        return;
+    }
+    
+    if(!g_file_test(filename, G_FILE_TEST_IS_REGULAR)) {
+        g_critical("Directory: %s", filename);
+        return;
+    }    
+    //open the file
+    FILE* file = fopen(filename, "r+");
+    
+    //double-check it.
+    if(!file) {
+            g_critical("Failed to open file: %s", filename);
+            return;
+    }
+    
+    //set buffering to zero, theoreticallly maximising scrubbing.
+    setbuf(file, NULL);
+    
+    //how big is the file? Well, go to the end, then tell me how far you are away. 
 	//That's C for you.
 	fseek(file, 0, SEEK_END);
 	int file_size = ftell(file);
 	if(file_size == 0) {
-		warning("Zero-byte file: ");
+		g_warning("Zero-byte file: %s", filename);
 		//nothing to do.
 		return;
 	}
-	
-	//go back to the start to prepare for writing.
+    
+    //go back to the start to prepare for writing.
 	fseek(file, 0, SEEK_SET);
-	
-	//allocate X bytes of memory off the stack.
-	unsigned char* buffer = (unsigned char*)malloc(BUFFER_SIZE * sizeof(unsigned char));
-	
-	//uh-oh-very big file or some sort of other failure.
-	if(buffer == NULL) {
-		error("Failed to allocate memory! <this is very bad>");
-		fclose(file);
-		free(buffer);
-		return;
-	}
-	
-	for(int j = 0; j < prefs->passes; j++) {
-		for(int i = 0; i < 2; i++) {
-			//where are we?
-			int position = 0;
-		
-			fseek(file, 0, SEEK_SET);
-		
-			//initialise buffer with random stuff.
-			for(int x = 0; x < (BUFFER_SIZE * sizeof(unsigned char)); x++) {
-				//pass 0: random. pass1: 1. pass 2: 0.
+    
+    //allocate X bytes of memory off the stack.
+	guchar* buffer = (guchar*)g_malloc(BUFFER_SIZE * sizeof(guchar));
+    
+    //uh-oh. This is bad, since when was 1KB of RAM a big request?
+    if(!buffer) 
+        g_error("Failed to allocate memory...Houston, we have a problem!");
+        
+    //iterate over passes
+    for(guint j = 0; j < pref->passes; j++) {
+        //iterate over random, 1, 0.
+		for(guint8 i = 0; i < 2; i++) {
+            //where are we?
+            guint64 position = 0;
+            
+            //reset file
+            fseek(file, 0, SEEK_SET);
+            
+            //initialise buffer
+			for(guint x = 0; x < (BUFFER_SIZE * sizeof(guchar)); x++) {
+				//pass 0: random. pass1: TRUE. pass 2: FALSE.
 				switch(i){
 					case 0:
 						//re-randomise from rand()
-						srand((unsigned int)rand());
-						buffer[x] = (unsigned char)(rand() % (255 + 1));
+						srand((guint)rand());
+						buffer[x] = (guchar)(rand() % (255 + 1));
 						break;
 					
 					case 1:
@@ -82,98 +97,130 @@ void file_shred(const char* filename) {
 						buffer[x] = '\000';
 				}
 			}
-		
-			//while we're not at EOF
+            //while we're not at EOF
 			while(position < file_size) {
-			
-				//if we're still in business
+                //if we're still > BUFFER_SIZE away from EOF:
 				if(position + BUFFER_SIZE <= file_size) {
-					fwrite(buffer, sizeof(unsigned char), BUFFER_SIZE, file);
-				
+					fwrite(buffer, sizeof(guchar), BUFFER_SIZE, file);
+                    
 					//update our position
 					position += BUFFER_SIZE;
-				}
-			
-				//otherwise, write what's left over.
+                }
+                
+                //do the bits remaining
 				else {
-					fwrite(buffer, sizeof(unsigned char), (file_size - position), file);
+					fwrite(buffer, sizeof(guchar), (file_size - position), file);
 				
 					//we're now at EOF and can break from loop.
 					position = file_size;
-				}
+                }
+            }
+        }
+    }
+    //close file
+    fclose(file);
+    //remove if necessary
+    if(pref->remove) {
+		g_unlink(filename);
+	}
+    //free() malloc'd memory
+    g_free(buffer);
+}
+
+//simple callback to increment the number of files
+int count_callback(const gchar* filename, const struct stat* result, gint info, struct FTW* more_info) {
+    total_files++;
+    return 0;
+}
+
+//simple callback to shred files
+int shred_callback(const gchar* filename, const struct stat* result, gint info, struct FTW* more_info) {
+    //set information...
+    progress_status = get_name_from_uri(filename);
+    //shreddit!
+    if (info == FTW_F) shred_single_file(filename);
+    //...and update the total.
+    current_total++;
+    //recalculate as necessary:
+    progress_proportion = current_total/total_files;
+    files_left = total_files - current_total;
+    return 0;
+}
+
+//function to get the total number of files
+void get_total(GtkListStore* file_list) {
+    GtkTreeIter iter;
+    //get first value, or a problem if there isn't one.
+    gboolean valid = gtk_tree_model_get_iter_first(GTK_TREE_MODEL(file_list), &iter);
+    gchar* filename;
+    
+    while(valid) {
+        //get the next value
+        gtk_tree_model_get(GTK_TREE_MODEL(file_list), &iter, COL_URI, &filename, -1);
+        //if it's a directory...
+        if(g_file_test(filename, G_FILE_TEST_IS_DIR)) {
+            //setup ftw...
+            gint ftw_flags = 0;
+            ftw_flags |= FTW_PHYS;
+            //iterate over files, increasing filecount.
+            nftw(filename, count_callback, 20, ftw_flags);
+        }
+        //otherwise, just increase the filecount.
+        else {
+            total_files++;
+        }
+        //point to next set of values
+        valid = gtk_tree_model_iter_next(GTK_TREE_MODEL(file_list), &iter);
+    }
+            
+}
+
+
+void shred_all(struct prefs* in_pref) {
+    //update local preferences
+    pref = in_pref;
+    //get the total number of files, for the progressbar.
+    get_total(file_list);
+    
+    //now, start work.
+    GtkTreeIter iter;
+    //get first value, or a problem if there isn't one.
+    gboolean valid = gtk_tree_model_get_iter_first(GTK_TREE_MODEL(file_list), &iter);
+    gchar* filename;
+    
+    while(valid) {
+        //get the next value
+        gtk_tree_model_get(GTK_TREE_MODEL(file_list), &iter, COL_URI, &filename, -1);
+        //if it's a directory...
+        if(g_file_test(filename, G_FILE_TEST_IS_DIR)) {
+            //setup ftw...
+            gint ftw_flags = 0;
+            ftw_flags |= FTW_PHYS;
+            //iterate over files, shredding as we go.
+            nftw(filename, shred_callback, 20, ftw_flags);
+            //remove if necessary
+            if(pref->remove) {
+				g_remove(filename);
 			}
-		}
-	}
-	
-	//free the buffer.
-	free(buffer);
-	
-	//close the file
-	fclose(file);
-	
-	//if we're meant to remove the file...
-	if(prefs->remove == 1) {
-		int i = remove(filename);
-		if(i < 0) warning("Could not remove file.");
-	}
-} 
-
-//have we got a dir?
-int is_dir(const char* filename) {
-	struct stat result;
-	
-	//uh-oh
-	if(stat(filename, &result) == -1){
-		printf("Could not stat file: %s\n", filename);
-		return -2;
-	}
-	
-	//handy macro, this. Returns 1 if true, 0 if false.
-	return S_ISDIR(result.st_mode);
+        }
+        //otherwise, just shred the file.
+        else {
+            //set status
+            progress_status = filename;
+            //shreddit!
+            shred_single_file(filename);
+            //remove if necessary
+            if(pref->remove) {
+				g_remove(filename);
+			}
+            //increment 'done' pile.
+            current_total++;
+            //recalculate
+            progress_proportion = current_total/total_files;
+            files_left = total_files - current_total;
+        }
+        //point to next set of values
+        valid = gtk_tree_model_iter_next(GTK_TREE_MODEL(file_list), &iter);
+    }
+    g_message("Complete.");    
 }
-
-//callback function for ftw() 
-int shred_callback(const char* filename, const struct stat* result, int info, struct FTW* more_info) {
-	if(info == FTW_F) {
-		printf("%s\n", filename);
-		file_shred(filename);	
-	}
-	return 0;
-}
-
-void shred(const char* filename, struct preferences* in_prefs) {
-	
-	prefs = in_prefs;
-	
-	switch(is_dir(filename)) {
-		
-		//there's been an error
-		case (-2): {
-			return;
-			break;
-		}
-			
-		case (0): {
-			printf("File: %s\n", filename);
-			file_shred(filename);
-			break;
-		}
-			
-		case (1): {
-			printf("Dir: %s\n", filename);
-			int flags = 0;
-			flags |= FTW_PHYS;
-			nftw(filename, shred_callback, 20, flags);
-			break;
-		}
-			
-		default: {
-			return;
-			break;
-		}
-			
-	}
-}
-	
-	
-	

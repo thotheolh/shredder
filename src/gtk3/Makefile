@@ -1,11 +1,12 @@
 CC=gcc
-CFLAGS=-Wall --std=c99 -ggdb `pkg-config --cflags --libs gtk+-3.0` `pkg-config --cflags --libs glib-2.0` -lpthread
-OBJECTS=core/error.o core/shred.o
+CFLAGS=-export-dynamic `pkg-config --cflags --libs gtk+-3.0` -Wall --std=c99 -ggdb
+OBJECTS=core/shred.o core/util.o main.o 
+NAME=shredder
 
 make: $(OBJECTS)
-	$(CC) $(OBJECTS) main.c -o shredder $(CFLAGS) 
+	$(CC) $(OBJECTS) $(CFLAGS) -o $(NAME) 
 
 clean: 
-	rm $(OBJECTS) shredder
+	rm -f $(OBJECTS) $(NAME)
 
 .PHONY: clean
