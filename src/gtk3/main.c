@@ -3,24 +3,31 @@
 #include <stdlib.h>
 #include "core/shredder.h"
 #include "core/util.h"
-
+/*
+ *Global variables for passing between threads
+ */
 //message string for progress dialog
 gchar* progress_status;
 //percentage done. 
 gdouble progress_proportion;
 //files left
 guint files_left;
+//main store for all shred items.
+GtkListStore* file_list;
 
+/*
+ *Local variables for sharing (convenience) between functions
+ */ 
 //builder object
-GtkBuilder* builder;
+static GtkBuilder* builder;
 //main store for all shred items.
 GtkListStore* file_list;
 //the default icon theme
-GtkIconTheme* icon_theme;
+static GtkIconTheme* icon_theme;
 //global preferences
-struct prefs all_pref = {3, FALSE};
+static struct prefs all_pref = {3, FALSE};
 //progressbar
-GtkProgressBar* progress_bar;
+static GtkProgressBar* progress_bar;
 
 //shred forward declaration
 void shred_all(struct prefs* in_pref);
@@ -97,7 +104,11 @@ void on_open_folder() {
 void on_preferences() {
 	//set according to preferences
 	gtk_switch_set_active(GTK_SWITCH(gtk_builder_get_object(builder, "preferences_window_backend_remove")), all_pref.remove);
+	gtk_switch_set_active(GTK_SWITCH(gtk_builder_get_object(builder, "preferences_window_application_dnd")), all_pref.dnd);
 	gtk_range_set_value(GTK_RANGE(gtk_builder_get_object(builder, "preferences_window_backend_passes")), all_pref.passes);
+	//vertical scrolling is a 'TRUE' value. +vice-versa
+    if(all_pref.scroll) gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(gtk_builder_get_object(builder, "preferences_window_application_scrollv")), TRUE);
+    else gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(gtk_builder_get_object(builder, "preferences_window_application_scrollh")), TRUE);
     gtk_widget_show_all(GTK_WIDGET(gtk_builder_get_object(builder, "preferences_window")));
 }
 
@@ -106,6 +117,9 @@ void on_preferences_hide() {
 	//save configuration
 	all_pref.remove = gtk_switch_get_active(GTK_SWITCH(gtk_builder_get_object(builder, "preferences_window_backend_remove")));
 	all_pref.passes = gtk_range_get_value(GTK_RANGE(gtk_builder_get_object(builder, "preferences_window_backend_passes")));
+	all_pref.dnd = gtk_switch_get_active(GTK_SWITCH(gtk_builder_get_object(builder, "preferences_window_application_dnd")));
+	if(gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(gtk_builder_get_object(builder, "preferences_window_application_scrollv")))) all_pref.scroll = TRUE;
+	else all_pref.scroll=FALSE;
 	gtk_widget_hide(GTK_WIDGET(gtk_builder_get_object(builder, "preferences_window")));
 }
 
@@ -191,6 +205,9 @@ int main(int argc, char** argv) {
     //intialise file list for use.
     file_list = gtk_list_store_new(3, G_TYPE_STRING, GDK_TYPE_PIXBUF, G_TYPE_STRING);
     
+    //load preferences
+    all_pref = load_preferences();
+    
     //initialise the XML loader
     builder = gtk_builder_new();
     //add XML to loader
@@ -212,10 +229,7 @@ int main(int argc, char** argv) {
     g_signal_connect(icon_view, "drag-data-received", G_CALLBACK (on_drop), file_list);
     
     //load icon theme
-    icon_theme = gtk_icon_theme_get_default();
-    
-    //load preferences
-    all_pref = load_preferences(); 
+    icon_theme = gtk_icon_theme_get_default(); 
     
     //show main window
     GtkWindow* shredder_window = GTK_WINDOW(gtk_builder_get_object(builder, "shredder_window"));

@@ -8,7 +8,7 @@
 
 #include "shredder.h"
 
-const gchar* DEFAULT_PREFS = "[Application]\n[Backend]\npasses=3\nremove=false";
+const gchar* DEFAULT_PREFS = "[Application]\ndnd=true\nscroll=true[Backend]\npasses=3\nremove=false";
 
 //get a filename from a URI
 gchar* get_name_from_uri(const gchar* uri) {
@@ -48,10 +48,13 @@ struct prefs load_preferences() {
     if(!g_key_file_load_from_file(file, config_file, G_KEY_FILE_NONE, NULL)) {
         make_default_preferences();
         g_warning("Error opening config file, creating default");
+        
     }
     //get values form the loader
     pref.passes = g_key_file_get_integer(file, "Backend", "passes", NULL);
     pref.remove = g_key_file_get_boolean(file, "Backend", "remove", NULL);
+    pref.dnd = g_key_file_get_boolean(file, "Application", "dnd", NULL);
+    pref.scroll = g_key_file_get_boolean(file, "Application", "scroll", NULL);
     
     //free the key file
     g_key_file_free(file);
@@ -69,6 +72,8 @@ void save_preferences(struct prefs* pref) {
 	//set values
 	g_key_file_set_integer(file, "Backend", "passes", pref->passes);
 	g_key_file_set_boolean(file, "Backend", "remove", pref->remove);
+	g_key_file_set_boolean(file, "Application", "dnd", pref->dnd);
+	g_key_file_set_boolean(file, "Application", "scroll", pref->scroll);
 	
 	//write values
 	gchar* data = g_key_file_to_data(file, NULL, NULL);

@@ -10,6 +10,8 @@ enum {COL_NAME, COL_PIXBUF, COL_URI};
 struct prefs {
     guint passes;
     gboolean remove;
+    gboolean dnd;
+    gboolean scroll;
 };
 
 #endif
