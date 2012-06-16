@@ -12,8 +12,6 @@ gchar* progress_status;
 gdouble progress_proportion;
 //files left
 guint files_left;
-//main store for all shred items.
-GtkListStore* file_list;
 
 /*
  *Local variables for sharing (convenience) between functions
@@ -100,6 +98,31 @@ void on_open_folder() {
     gtk_widget_destroy(GTK_WIDGET(dialog));
 }
 
+void on_drop(GtkWidget* icon_view, GdkDragContext *drag_context, int x, int y, GtkSelectionData* data, int info, int time, gpointer in_file_list) {
+	
+	gchar** split_uris_with_protocol = gtk_selection_data_get_uris(data);
+	
+    
+    //e.g. [file:///home/bob/test], ---> [file:///home/bob/test2], --->| [\0]
+	while(*split_uris_with_protocol != NULL) {
+		//e.g. /home/bob/test
+		gchar* uri = g_filename_from_uri(*split_uris_with_protocol, NULL, NULL);
+		//e.g. test
+		gchar* filename = get_name_from_uri(uri);
+
+		//insert values
+		gtk_list_store_insert_with_values(file_list, NULL, -1,
+                                COL_NAME, filename,
+                                COL_PIXBUF, get_icon_from_filename(uri, icon_theme),
+                                COL_URI, uri,
+                                -1);
+        split_uris_with_protocol++;
+    }
+    
+	//finish the drag                            
+    gtk_drag_finish(drag_context, TRUE, FALSE, time);
+}
+
 //un-hide the preferences dialog
 void on_preferences() {
 	//set according to preferences
@@ -126,31 +149,6 @@ void on_preferences_hide() {
 //remove all items currently in view
 void on_clear() {
     gtk_list_store_clear(file_list);
-}
-
-void on_drop(GtkWidget* icon_view, GdkDragContext *drag_context, int x, int y, GtkSelectionData* data, int info, int time, gpointer in_file_list) {
-	
-	gchar** split_uris_with_protocol = gtk_selection_data_get_uris(data);
-	
-    
-    //e.g. [file:///home/bob/test], ---> [file:///home/bob/test2], --->| [\0]
-	while(*split_uris_with_protocol != NULL) {
-		//e.g. /home/bob/test
-		gchar* uri = g_filename_from_uri(*split_uris_with_protocol, NULL, NULL);
-		//e.g. test
-		gchar* filename = get_name_from_uri(uri);
-
-		//insert values
-		gtk_list_store_insert_with_values(file_list, NULL, -1,
-                                COL_NAME, filename,
-                                COL_PIXBUF, get_icon_from_filename(uri, icon_theme),
-                                COL_URI, uri,
-                                -1);
-        split_uris_with_protocol++;
-    }
-    
-	//finish the drag                            
-    gtk_drag_finish(drag_context, TRUE, FALSE, time);
 }
 
 //hide the progress box for reuse
@@ -225,8 +223,10 @@ int main(int argc, char** argv) {
     progress_bar = GTK_PROGRESS_BAR(gtk_builder_get_object(builder, "progress_window_bar"));
     
     //enable DnD.
-    gtk_icon_view_enable_model_drag_dest(icon_view, gtk_target_entry_new("text/uri-list", 0, 0), 1, GDK_ACTION_COPY);
-    g_signal_connect(icon_view, "drag-data-received", G_CALLBACK (on_drop), file_list);
+    if(all_pref.dnd) {
+		gtk_icon_view_enable_model_drag_dest(icon_view, gtk_target_entry_new("text/uri-list", 0, 0), 1, GDK_ACTION_COPY);
+		g_signal_connect(icon_view, "drag-data-received", G_CALLBACK (on_drop), file_list);
+	}
     
     //load icon theme
     icon_theme = gtk_icon_theme_get_default(); 

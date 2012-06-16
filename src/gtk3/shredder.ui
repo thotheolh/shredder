@@ -83,30 +83,35 @@ Michael Rawson &lt;michaelrawson76@gmail.com&gt;</property>
   </object>
   <object class="GtkWindow" id="preferences_window">
     <property name="can_focus">False</property>
-    <property name="modal">True</property>
     <property name="window_position">center-on-parent</property>
+    <property name="default_width">400</property>
+    <property name="default_height">300</property>
     <property name="destroy_with_parent">True</property>
     <property name="type_hint">dialog</property>
+    <property name="has_resize_grip">False</property>
     <signal name="delete-event" handler="on_preferences_hide" swapped="no"/>
     <child>
       <object class="GtkGrid" id="preferences_window_grid">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
+        <property name="row_spacing">15</property>
         <child>
           <object class="GtkFrame" id="preferences_window_app_frame">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="label_xalign">0</property>
-            <property name="shadow_type">out</property>
+            <property name="shadow_type">none</property>
             <child>
               <object class="GtkAlignment" id="alignment1">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
+                <property name="top_padding">5</property>
                 <child>
                   <object class="GtkBox" id="box1">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="orientation">vertical</property>
+                    <property name="spacing">15</property>
                     <child>
                       <object class="GtkBox" id="box4">
                         <property name="visible">True</property>
@@ -115,7 +120,7 @@ Michael Rawson &lt;michaelrawson76@gmail.com&gt;</property>
                           <object class="GtkLabel" id="label5">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">Enable drag and drop:</property>
+                            <property name="label" translatable="yes">	Enable drag and drop:</property>
                             <attributes>
                               <attribute name="style" value="italic"/>
                             </attributes>
@@ -156,7 +161,10 @@ Michael Rawson &lt;michaelrawson76@gmail.com&gt;</property>
                           <object class="GtkLabel" id="label6">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">Scroll icons:</property>
+                            <property name="label" translatable="yes">	Scroll icons:</property>
+                            <attributes>
+                              <attribute name="style" value="italic"/>
+                            </attributes>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -212,6 +220,7 @@ Michael Rawson &lt;michaelrawson76@gmail.com&gt;</property>
                           <packing>
                             <property name="expand">False</property>
                             <property name="fill">True</property>
+                            <property name="pack_type">end</property>
                             <property name="position">1</property>
                           </packing>
                         </child>
@@ -247,26 +256,28 @@ Michael Rawson &lt;michaelrawson76@gmail.com&gt;</property>
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="label_xalign">0</property>
-            <property name="shadow_type">out</property>
+            <property name="shadow_type">none</property>
             <child>
               <object class="GtkAlignment" id="alignment2">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
+                <property name="top_padding">5</property>
                 <child>
                   <object class="GtkBox" id="preferences_window_backend_fram">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="orientation">vertical</property>
-                    <property name="spacing">5</property>
+                    <property name="spacing">15</property>
                     <child>
                       <object class="GtkBox" id="box3">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
+                        <property name="spacing">15</property>
                         <child>
                           <object class="GtkLabel" id="label4">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">Remove files after overwrite:   </property>
+                            <property name="label" translatable="yes">	Remove files after overwrite:   </property>
                             <attributes>
                               <attribute name="style" value="italic"/>
                             </attributes>
@@ -307,7 +318,7 @@ Michael Rawson &lt;michaelrawson76@gmail.com&gt;</property>
                           <object class="GtkLabel" id="label3">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">Passes:   </property>
+                            <property name="label" translatable="yes">	Passes:   </property>
                             <attributes>
                               <attribute name="style" value="italic"/>
                             </attributes>
@@ -356,7 +367,49 @@ Michael Rawson &lt;michaelrawson76@gmail.com&gt;</property>
           </object>
           <packing>
             <property name="left_attach">0</property>
+            <property name="top_attach">2</property>
+            <property name="width">1</property>
+            <property name="height">1</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkSeparator" id="separator1">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+          </object>
+          <packing>
+            <property name="left_attach">0</property>
             <property name="top_attach">1</property>
+            <property name="width">1</property>
+            <property name="height">1</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkBox" id="box7">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <child>
+              <object class="GtkButton" id="button1">
+                <property name="label">gtk-apply</property>
+                <property name="use_action_appearance">False</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+                <property name="use_action_appearance">False</property>
+                <property name="use_stock">True</property>
+                <signal name="clicked" handler="on_preferences_hide" swapped="no"/>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="pack_type">end</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="left_attach">0</property>
+            <property name="top_attach">3</property>
             <property name="width">1</property>
             <property name="height">1</property>
           </packing>
@@ -644,6 +697,9 @@ Michael Rawson &lt;michaelrawson76@gmail.com&gt;</property>
           </packing>
         </child>
         <child>
+          <placeholder/>
+        </child>
+        <child>
           <object class="GtkScrolledWindow" id="icon_scroll">
             <property name="visible">True</property>
             <property name="can_focus">True</property>
@@ -659,11 +715,8 @@ Michael Rawson &lt;michaelrawson76@gmail.com&gt;</property>
           <packing>
             <property name="expand">True</property>
             <property name="fill">True</property>
-            <property name="position">1</property>
+            <property name="position">2</property>
           </packing>
-        </child>
-        <child>
-          <placeholder/>
         </child>
       </object>
     </child>
