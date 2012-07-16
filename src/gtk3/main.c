@@ -23,7 +23,7 @@ GtkListStore* file_list;
 //the default icon theme
 static GtkIconTheme* icon_theme;
 //global preferences
-static struct prefs all_pref = {3, FALSE};
+static struct prefs all_pref = {3, FALSE, TRUE, TRUE};
 //progressbar
 static GtkProgressBar* progress_bar;
 
@@ -192,6 +192,8 @@ void on_shred() {
 
 //kill the mainloop
 void on_quit() {
+	//write config to disk
+    save_preferences(&all_pref);
     g_message("Bye!");
     gtk_main_quit();
 }
@@ -237,9 +239,6 @@ int main(int argc, char** argv) {
     
     //loop until quit
     gtk_main();
-    
-    //write config to disk
-    save_preferences(&all_pref);
     
     //die.
     return 0;

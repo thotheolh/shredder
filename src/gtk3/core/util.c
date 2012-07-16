@@ -27,34 +27,42 @@ GdkPixbuf* get_icon_from_filename(const gchar* uri, GtkIconTheme* icon_theme) {
 }
 
 //make the default preferences, should there be a problem
-void make_default_preferences() {
+struct prefs make_default_preferences() {
     gchar* path = g_strconcat(getenv("HOME"), "/.config/shredder", NULL);
     FILE* file = fopen(path, "w+");
     //.......................<|.....get length of string....|>
     fwrite(DEFAULT_PREFS, 1, g_utf8_strlen(DEFAULT_PREFS, -1), file);
     fclose(file);
     g_free(path);
+    struct prefs pref = {3, FALSE, TRUE, TRUE};
+    return pref;
 }
 
 //load preferences from file
 struct prefs load_preferences() {
 	//default values
-    struct prefs pref = {3, FALSE};
+    struct prefs pref;
     //blank config loader
     GKeyFile* file = g_key_file_new();
     //get config location
     gchar* config_file = g_strconcat(getenv("HOME"), "/.config/shredder", NULL);
     //if we've got a problem...
     if(!g_key_file_load_from_file(file, config_file, G_KEY_FILE_NONE, NULL)) {
-        make_default_preferences();
+        pref = make_default_preferences();
         g_warning("Error opening config file, creating default");
-        
+        //free the key file
+		g_key_file_free(file);
+		return pref;
     }
-    //get values form the loader
+    //get values from the loader
     pref.passes = g_key_file_get_integer(file, "Backend", "passes", NULL);
+    g_warning("%d\n", pref.passes);
     pref.remove = g_key_file_get_boolean(file, "Backend", "remove", NULL);
+    g_warning("%d\n", pref.remove);
     pref.dnd = g_key_file_get_boolean(file, "Application", "dnd", NULL);
+    g_warning("%d\n", pref.dnd);
     pref.scroll = g_key_file_get_boolean(file, "Application", "scroll", NULL);
+    g_warning("%d\n", pref.scroll);
     
     //free the key file
     g_key_file_free(file);
@@ -70,10 +78,10 @@ void save_preferences(struct prefs* pref) {
     g_key_file_load_from_file(file, config_file, G_KEY_FILE_NONE, NULL);
 	
 	//set values
-	g_key_file_set_integer(file, "Backend", "passes", pref->passes);
-	g_key_file_set_boolean(file, "Backend", "remove", pref->remove);
 	g_key_file_set_boolean(file, "Application", "dnd", pref->dnd);
 	g_key_file_set_boolean(file, "Application", "scroll", pref->scroll);
+	g_key_file_set_integer(file, "Backend", "passes", pref->passes);
+	g_key_file_set_boolean(file, "Backend", "remove", pref->remove);
 	
 	//write values
 	gchar* data = g_key_file_to_data(file, NULL, NULL);
