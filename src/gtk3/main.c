@@ -7,37 +7,29 @@
  *Global variables for passing between threads
  */
 //message string for progress dialog
-gchar* progress_status;
+gchar *progress_status;
 //percentage done. 
 gdouble progress_proportion;
 //files left
 guint files_left;
 
 /*
- *Local variables for sharing (convenience) between functions
+ *App struct for sharing widgets between functions.
  */ 
-//builder object
-static GtkBuilder* builder;
-//main store for all shred items.
-GtkListStore* file_list;
-//the default icon theme
-static GtkIconTheme* icon_theme;
-//global preferences
-static struct prefs all_pref = {3, FALSE, TRUE, TRUE};
-//progressbar
-static GtkProgressBar* progress_bar;
 
+struct App app;
+	
 //shred forward declaration
 void shred_all(struct prefs* in_pref);
 
 //show the about dialog-dialog is always existent, just usually hidden
 void on_about_show() {
-    gtk_widget_show_all(GTK_WIDGET(gtk_builder_get_object(builder, "about")));
+    gtk_widget_show_all(app.about);
 }
 
 //hide it again.
 void on_about_hide() {
-    gtk_widget_hide(GTK_WIDGET(gtk_builder_get_object(builder, "about")));
+    gtk_widget_hide(app.about);
 }
 
 //on using menu to add wastebasket
@@ -45,9 +37,9 @@ void on_trash() {
     gchar* trash = g_strjoin(NULL, g_getenv("HOME"), "/.local/share/Trash/files", NULL);
     
     //insert values
-    gtk_list_store_insert_with_values(file_list, NULL, -1,
+    gtk_list_store_insert_with_values(app.file_list, NULL, -1,
                                 COL_NAME, "Trash",
-                                COL_PIXBUF, gtk_icon_theme_load_icon(icon_theme, "user-trash", 48, 0, NULL),
+                                COL_PIXBUF, gtk_icon_theme_load_icon(app.icon_theme, "user-trash", 48, 0, NULL),
                                 COL_URI, trash,
                                 -1);
                                 
@@ -66,9 +58,9 @@ void on_open() {
 	if(gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_ACCEPT) {
         
         //insert values
-        gtk_list_store_insert_with_values(file_list, NULL, -1,
+        gtk_list_store_insert_with_values(app.file_list, NULL, -1,
                                     COL_NAME, get_name_from_uri(gtk_file_chooser_get_filename(dialog)),
-                                    COL_PIXBUF, get_icon_from_filename(gtk_file_chooser_get_filename(dialog), icon_theme),
+                                    COL_PIXBUF, get_icon_from_filename(gtk_file_chooser_get_filename(dialog), app.icon_theme),
                                     COL_URI, gtk_file_chooser_get_filename(dialog),
                                     -1);
     }
@@ -88,9 +80,9 @@ void on_open_folder() {
 	if(gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_ACCEPT) {
         
         //insert values
-        gtk_list_store_insert_with_values(file_list, NULL, -1,
+        gtk_list_store_insert_with_values(app.file_list, NULL, -1,
                                     COL_NAME, get_name_from_uri(gtk_file_chooser_get_filename(dialog)),
-                                    COL_PIXBUF, gtk_icon_theme_load_icon(icon_theme, "folder", 48, 0, NULL),
+                                    COL_PIXBUF, gtk_icon_theme_load_icon(app.icon_theme, "folder", 48, 0, NULL),
                                     COL_URI, gtk_file_chooser_get_filename(dialog),
                                     -1);
     }
@@ -111,9 +103,9 @@ void on_drop(GtkWidget* icon_view, GdkDragContext *drag_context, int x, int y, G
 		gchar* filename = get_name_from_uri(uri);
 
 		//insert values
-		gtk_list_store_insert_with_values(file_list, NULL, -1,
+		gtk_list_store_insert_with_values(app.file_list, NULL, -1,
                                 COL_NAME, filename,
-                                COL_PIXBUF, get_icon_from_filename(uri, icon_theme),
+                                COL_PIXBUF, get_icon_from_filename(uri, app.icon_theme),
                                 COL_URI, uri,
                                 -1);
         split_uris_with_protocol++;
@@ -126,44 +118,43 @@ void on_drop(GtkWidget* icon_view, GdkDragContext *drag_context, int x, int y, G
 //un-hide the preferences dialog
 void on_preferences() {
 	//set according to preferences
-	gtk_switch_set_active(GTK_SWITCH(gtk_builder_get_object(builder, "preferences_window_backend_remove")), all_pref.remove);
-	gtk_switch_set_active(GTK_SWITCH(gtk_builder_get_object(builder, "preferences_window_application_dnd")), all_pref.dnd);
-	gtk_range_set_value(GTK_RANGE(gtk_builder_get_object(builder, "preferences_window_backend_passes")), all_pref.passes);
+	gtk_switch_set_active(GTK_SWITCH(app.backend_remove), app.all_pref.remove);
+	gtk_switch_set_active(GTK_SWITCH(app.application_dnd), app.all_pref.dnd);
+	gtk_range_set_value(GTK_RANGE(app.backend_passes), app.all_pref.passes);
 	//vertical scrolling is a 'TRUE' value. +vice-versa
-    if(all_pref.scroll) gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(gtk_builder_get_object(builder, "preferences_window_application_scrollv")), TRUE);
-    else gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(gtk_builder_get_object(builder, "preferences_window_application_scrollh")), TRUE);
-    gtk_widget_show_all(GTK_WIDGET(gtk_builder_get_object(builder, "preferences_window")));
+    if(app.all_pref.scroll) gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(app.application_scrollv), TRUE);
+    else gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(app.application_scrollh), TRUE);
+    gtk_widget_show_all(app.preferences_window);
 }
 
 //hide preferences again
 void on_preferences_hide() {
 	//save configuration
-	all_pref.remove = gtk_switch_get_active(GTK_SWITCH(gtk_builder_get_object(builder, "preferences_window_backend_remove")));
-	all_pref.passes = gtk_range_get_value(GTK_RANGE(gtk_builder_get_object(builder, "preferences_window_backend_passes")));
-	all_pref.dnd = gtk_switch_get_active(GTK_SWITCH(gtk_builder_get_object(builder, "preferences_window_application_dnd")));
-	if(gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(gtk_builder_get_object(builder, "preferences_window_application_scrollv")))) all_pref.scroll = TRUE;
-	else all_pref.scroll=FALSE;
-	gtk_widget_hide(GTK_WIDGET(gtk_builder_get_object(builder, "preferences_window")));
+	app.all_pref.remove = gtk_switch_get_active(GTK_SWITCH(app.backend_remove));
+	app.all_pref.passes = gtk_range_get_value(GTK_RANGE(app.backend_passes));
+	app.all_pref.dnd = gtk_switch_get_active(GTK_SWITCH(app.application_dnd));
+	app.all_pref.scroll = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(app.application_scrollv));
+	gtk_widget_hide(app.preferences_window);
 }
 
 //remove all items currently in view
 void on_clear() {
-    gtk_list_store_clear(file_list);
+    gtk_list_store_clear(app.file_list);
 }
 
 //hide the progress box for reuse
 void on_progress_hide() {
-    gtk_widget_hide(GTK_WIDGET(gtk_builder_get_object(builder, "progress_window")));
+    gtk_widget_hide(app.progress_window);
 }
 
 //every so often, update this.
 gboolean check_dialog() {
     //set progressbar
-    gtk_progress_bar_set_fraction(progress_bar, progress_proportion);
+    gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(app.progress_bar), progress_proportion);
     //set text from the status
-    gtk_progress_bar_set_text(progress_bar, progress_status);
+    gtk_progress_bar_set_text(GTK_PROGRESS_BAR(app.progress_bar), progress_status);
     //set files remaining field.
-    gtk_label_set_text(GTK_LABEL(gtk_builder_get_object(builder, "progress_window_files_var")), g_strdup_printf("%i", files_left)); 
+    gtk_label_set_text(GTK_LABEL(app.progress_label), g_strdup_printf("%i", files_left)); 
     
     //when done..
     if(progress_proportion == 1) {
@@ -183,17 +174,17 @@ void on_shred() {
     //reset bar
     progress_proportion = 0;
     //show the progress window
-    gtk_widget_show_all(GTK_WIDGET(gtk_builder_get_object(builder, "progress_window")));
+    gtk_widget_show_all(app.progress_window);
     //Periodically update the progress window, when we have some spare CPU time.
     g_idle_add((gpointer)(check_dialog), NULL);
     //spawn worker thread to do work for us. Commmunicates through global variables.
-    g_thread_new("shredding", (gpointer)(shred_all), &all_pref);
+    g_thread_new("shredding", (gpointer)(shred_all), &(app.all_pref));
 }
 
 //kill the mainloop
 void on_quit() {
 	//write config to disk
-    save_preferences(&all_pref);
+    save_preferences(&(app.all_pref));
     g_message("Bye!");
     gtk_main_quit();
 }
@@ -202,40 +193,34 @@ int main(int argc, char** argv) {
     //start Gtk+
     gtk_init(&argc, &argv);
     
-    //intialise file list for use.
-    file_list = gtk_list_store_new(3, G_TYPE_STRING, GDK_TYPE_PIXBUF, G_TYPE_STRING);
-    
-    //load preferences
-    all_pref = load_preferences();
-    
-    //initialise the XML loader
-    builder = gtk_builder_new();
-    //add XML to loader
-    gtk_builder_add_from_file(builder, "./shredder.ui", NULL);
-    //load signals from loader
-    gtk_builder_connect_signals(builder, NULL);
-    
-    //load iconview from XML
-    GtkIconView* icon_view = GTK_ICON_VIEW(gtk_builder_get_object(builder, "icon_view"));
-	gtk_icon_view_set_model(icon_view, GTK_TREE_MODEL(file_list)); 
-	gtk_icon_view_set_text_column (icon_view, COL_NAME);
-	gtk_icon_view_set_pixbuf_column (icon_view, COL_PIXBUF);
-    
-    //load progressbar from XML
-    progress_bar = GTK_PROGRESS_BAR(gtk_builder_get_object(builder, "progress_window_bar"));
-    
-    //enable DnD.
-    if(all_pref.dnd) {
-		gtk_icon_view_enable_model_drag_dest(icon_view, gtk_target_entry_new("text/uri-list", 0, 0), 1, GDK_ACTION_COPY);
-		g_signal_connect(icon_view, "drag-data-received", G_CALLBACK (on_drop), file_list);
+    //intialise apps struct
+    app.file_list = gtk_list_store_new(3, G_TYPE_STRING, GDK_TYPE_PIXBUF, G_TYPE_STRING);
+    app.all_pref = load_preferences();
+    app.builder = gtk_builder_new();
+    gtk_builder_add_from_file(app.builder, argv[1], NULL);
+	gtk_builder_connect_signals(app.builder, NULL);
+	app.icon_view = gtk_builder_get_object(app.builder, "icon_view");
+gtk_icon_view_set_model(GTK_ICON_VIEW(app.icon_view), GTK_TREE_MODEL(app.file_list)); 
+	gtk_icon_view_set_text_column(GTK_ICON_VIEW(app.icon_view), COL_NAME);
+	gtk_icon_view_set_pixbuf_column(GTK_ICON_VIEW(app.icon_view), COL_PIXBUF);
+    app.progress_bar = gtk_builder_get_object(app.builder, "progress_window_bar");
+    if(app.all_pref.dnd) {
+		gtk_icon_view_enable_model_drag_dest(app.icon_view, gtk_target_entry_new("text/uri-list", 0, 0), 1, GDK_ACTION_COPY);
+		g_signal_connect(app.icon_view, "drag-data-received", G_CALLBACK (on_drop), app.file_list);
 	}
-    
-    //load icon theme
-    icon_theme = gtk_icon_theme_get_default(); 
-    
-    //show main window
-    GtkWindow* shredder_window = GTK_WINDOW(gtk_builder_get_object(builder, "shredder_window"));
-    gtk_widget_show_all(GTK_WIDGET(shredder_window));
+    app.icon_theme = gtk_icon_theme_get_default();
+	app.about = gtk_builder_get_object(app.builder, "about");
+	app.progress_window = gtk_builder_get_object(app.builder, "progress_window");
+	app.progress_bar = gtk_builder_get_object(app.builder, "progress_window_bar");
+	app.progress_label = gtk_builder_get_object(app.builder, "progress_window_var");
+	app.backend_remove = gtk_builder_get_object(app.builder, "preferences_window_backend_remove");
+	app.backend_passes = gtk_builder_get_object(app.builder, "preferences_window_backend_passes");
+	app.application_dnd = gtk_builder_get_object(app.builder, "preferences_window_application_dnd");
+	app.application_scrollv =  gtk_builder_get_object(app.builder, "preferences_window_application_scrollv"); 
+	app.application_scrollh =  gtk_builder_get_object(app.builder, "preferences_window_application_scrollh");
+	app.preferences_window = gtk_builder_get_object(app.builder, "preferences_window"); 
+    app.shredder_window = gtk_builder_get_object(app.builder, "shredder_window");
+    gtk_widget_show_all(app.shredder_window);
     
     //loop until quit
     gtk_main();

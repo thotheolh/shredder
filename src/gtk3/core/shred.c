@@ -21,7 +21,7 @@ extern gdouble progress_proportion;
 extern gchar* progress_status;
 extern guint files_left;
 
-extern GtkListStore* file_list; 
+extern struct App app; 
 
 //Low-level file shredding. Deals with individual files
 void shred_single_file(const gchar* filename) {
@@ -148,15 +148,15 @@ int shred_callback(const gchar* filename, const struct stat* result, gint info, 
 }
 
 //function to get the total number of files
-void get_total(GtkListStore* file_list) {
+void get_total() {
     GtkTreeIter iter;
     //get first value, or a problem if there isn't one.
-    gboolean valid = gtk_tree_model_get_iter_first(GTK_TREE_MODEL(file_list), &iter);
+    gboolean valid = gtk_tree_model_get_iter_first(GTK_TREE_MODEL(app.file_list), &iter);
     gchar* filename;
     
     while(valid) {
         //get the next value
-        gtk_tree_model_get(GTK_TREE_MODEL(file_list), &iter, COL_URI, &filename, -1);
+        gtk_tree_model_get(GTK_TREE_MODEL(app.file_list), &iter, COL_URI, &filename, -1);
         //if it's a directory...
         if(g_file_test(filename, G_FILE_TEST_IS_DIR)) {
             //setup ftw...
@@ -170,7 +170,7 @@ void get_total(GtkListStore* file_list) {
             total_files++;
         }
         //point to next set of values
-        valid = gtk_tree_model_iter_next(GTK_TREE_MODEL(file_list), &iter);
+        valid = gtk_tree_model_iter_next(GTK_TREE_MODEL(app.file_list), &iter);
     }
             
 }
@@ -180,17 +180,17 @@ void shred_all(struct prefs* in_pref) {
     //update local preferences
     pref = in_pref;
     //get the total number of files, for the progressbar.
-    get_total(file_list);
+    get_total(app.file_list);
     
     //now, start work.
     GtkTreeIter iter;
     //get first value, or a problem if there isn't one.
-    gboolean valid = gtk_tree_model_get_iter_first(GTK_TREE_MODEL(file_list), &iter);
+    gboolean valid = gtk_tree_model_get_iter_first(GTK_TREE_MODEL(app.file_list), &iter);
     gchar* filename;
     
     while(valid) {
         //get the next value
-        gtk_tree_model_get(GTK_TREE_MODEL(file_list), &iter, COL_URI, &filename, -1);
+        gtk_tree_model_get(GTK_TREE_MODEL(app.file_list), &iter, COL_URI, &filename, -1);
         //if it's a directory...
         if(g_file_test(filename, G_FILE_TEST_IS_DIR)) {
             //setup ftw...
@@ -220,7 +220,7 @@ void shred_all(struct prefs* in_pref) {
             files_left = total_files - current_total;
         }
         //point to next set of values
-        valid = gtk_tree_model_iter_next(GTK_TREE_MODEL(file_list), &iter);
+        valid = gtk_tree_model_iter_next(GTK_TREE_MODEL(app.file_list), &iter);
     }
     g_message("Complete.");    
 }
