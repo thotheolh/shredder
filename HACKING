@@ -1,0 +1,18 @@
+Shredder is an application for securely deleting files.
+
+We need:
+
+-Data expert. Is our data *actually* deleted? How can our algorithm be better? Recommended number of iterations?
+
+-Translations support. Gettext is preferable.
+
+-Code optimisers. Code is a bit messy at present and could be faster.
+
+-Testing. Only two people on a project, doesn't get tested very much.
+
+You can contact the main two developers at:
+
+michaelrawson76@gmail.com
+twzgerald@gmail.com
+
+We don't bite, really! And any level of work will be rewarded in an entry in the about dialog. :)

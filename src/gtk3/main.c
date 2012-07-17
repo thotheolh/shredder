@@ -211,7 +211,7 @@ int main(int argc, char** argv) {
     //initialise the XML loader
     builder = gtk_builder_new();
     //add XML to loader
-    gtk_builder_add_from_file(builder, "shredder.ui", NULL);
+    gtk_builder_add_from_file(builder, "./shredder.ui", NULL);
     //load signals from loader
     gtk_builder_connect_signals(builder, NULL);
     
