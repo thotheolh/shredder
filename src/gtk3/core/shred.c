@@ -13,7 +13,6 @@
 #include "util.h"
 
 #define BUFFER_SIZE 1024
-struct prefs* pref;
 gfloat total_files = 0;
 gfloat current_total = 0;
 
@@ -25,26 +24,11 @@ extern struct App app;
 
 //Low-level file shredding. Deals with individual files
 void shred_single_file(const gchar* filename) {
-
-    //check it
-    if(!g_file_test(filename, G_FILE_TEST_EXISTS)) {
-        g_critical("Non-existent file: %s", filename);
-        return;
-    }
-    
-    if(!g_file_test(filename, G_FILE_TEST_IS_REGULAR)) {
-        g_critical("Directory: %s", filename);
-        return;
-    }    
-    //open the file
-    FILE* file = fopen(filename, "r+");
-    
-    //double-check it.
-    if(!file) {
-            g_critical("Failed to open file: %s", filename);
-            return;
-    }
-    
+ 
+	FILE *file = load_file(filename);
+	if(!file) {
+		return;
+	}    
     //set buffering to zero, theoreticallly maximising scrubbing.
     setbuf(file, NULL);
     
@@ -69,7 +53,7 @@ void shred_single_file(const gchar* filename) {
         g_error("Failed to allocate memory...Houston, we have a problem!");
         
     //iterate over passes
-    for(guint j = 0; j < pref->passes; j++) {
+    for(guint j = 0; j < app.all_pref.passes; j++) {
         //iterate over random, 1, 0.
 		for(guint8 i = 0; i < 2; i++) {
             //where are we?
@@ -120,7 +104,7 @@ void shred_single_file(const gchar* filename) {
     //close file
     fclose(file);
     //remove if necessary
-    if(pref->remove) {
+    if(app.all_pref.remove) {
 		g_unlink(filename);
 	}
     //free() malloc'd memory
@@ -136,7 +120,7 @@ int count_callback(const gchar* filename, const struct stat* result, gint info, 
 //simple callback to shred files
 int shred_callback(const gchar* filename, const struct stat* result, gint info, struct FTW* more_info) {
     //set information...
-    progress_status = get_name_from_uri(filename);
+    progress_status = g_path_get_basename(filename);
     //shreddit!
     if (info == FTW_F) shred_single_file(filename);
     //...and update the total.
@@ -176,9 +160,7 @@ void get_total() {
 }
 
 
-void shred_all(struct prefs* in_pref) {
-    //update local preferences
-    pref = in_pref;
+void shred_all() {
     //get the total number of files, for the progressbar.
     get_total(app.file_list);
     
@@ -199,7 +181,7 @@ void shred_all(struct prefs* in_pref) {
             //iterate over files, shredding as we go.
             nftw(filename, shred_callback, 20, ftw_flags);
             //remove if necessary
-            if(pref->remove) {
+            if(app.all_pref.remove) {
 				g_remove(filename);
 			}
         }
@@ -210,7 +192,7 @@ void shred_all(struct prefs* in_pref) {
             //shreddit!
             shred_single_file(filename);
             //remove if necessary
-            if(pref->remove) {
+            if(app.all_pref.remove) {
 				g_remove(filename);
 			}
             //increment 'done' pile.

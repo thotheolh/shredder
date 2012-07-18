@@ -59,7 +59,7 @@ void on_open() {
         
         //insert values
         gtk_list_store_insert_with_values(app.file_list, NULL, -1,
-                                    COL_NAME, get_name_from_uri(gtk_file_chooser_get_filename(dialog)),
+                                    COL_NAME, g_path_get_basename(gtk_file_chooser_get_filename(dialog)),
                                     COL_PIXBUF, get_icon_from_filename(gtk_file_chooser_get_filename(dialog), app.icon_theme),
                                     COL_URI, gtk_file_chooser_get_filename(dialog),
                                     -1);
@@ -81,7 +81,7 @@ void on_open_folder() {
         
         //insert values
         gtk_list_store_insert_with_values(app.file_list, NULL, -1,
-                                    COL_NAME, get_name_from_uri(gtk_file_chooser_get_filename(dialog)),
+                                    COL_NAME, g_path_get_basename(gtk_file_chooser_get_filename(dialog)),
                                     COL_PIXBUF, gtk_icon_theme_load_icon(app.icon_theme, "folder", 48, 0, NULL),
                                     COL_URI, gtk_file_chooser_get_filename(dialog),
                                     -1);
@@ -100,7 +100,7 @@ void on_drop(GtkWidget* icon_view, GdkDragContext *drag_context, int x, int y, G
 		//e.g. /home/bob/test
 		gchar* uri = g_filename_from_uri(*split_uris_with_protocol, NULL, NULL);
 		//e.g. test
-		gchar* filename = get_name_from_uri(uri);
+		gchar* filename = g_path_get_basename(uri);
 
 		//insert values
 		gtk_list_store_insert_with_values(app.file_list, NULL, -1,
@@ -199,27 +199,27 @@ int main(int argc, char** argv) {
     app.builder = gtk_builder_new();
     gtk_builder_add_from_file(app.builder, argv[1], NULL);
 	gtk_builder_connect_signals(app.builder, NULL);
-	app.icon_view = gtk_builder_get_object(app.builder, "icon_view");
+	app.icon_view = GTK_WIDGET(gtk_builder_get_object(app.builder, "icon_view"));
 gtk_icon_view_set_model(GTK_ICON_VIEW(app.icon_view), GTK_TREE_MODEL(app.file_list)); 
 	gtk_icon_view_set_text_column(GTK_ICON_VIEW(app.icon_view), COL_NAME);
 	gtk_icon_view_set_pixbuf_column(GTK_ICON_VIEW(app.icon_view), COL_PIXBUF);
-    app.progress_bar = gtk_builder_get_object(app.builder, "progress_window_bar");
+    app.progress_bar = GTK_WIDGET(gtk_builder_get_object(app.builder, "progress_window_bar"));
     if(app.all_pref.dnd) {
-		gtk_icon_view_enable_model_drag_dest(app.icon_view, gtk_target_entry_new("text/uri-list", 0, 0), 1, GDK_ACTION_COPY);
+		gtk_icon_view_enable_model_drag_dest(GTK_ICON_VIEW(app.icon_view), gtk_target_entry_new("text/uri-list", 0, 0), 1, GDK_ACTION_COPY);
 		g_signal_connect(app.icon_view, "drag-data-received", G_CALLBACK (on_drop), app.file_list);
 	}
     app.icon_theme = gtk_icon_theme_get_default();
-	app.about = gtk_builder_get_object(app.builder, "about");
-	app.progress_window = gtk_builder_get_object(app.builder, "progress_window");
-	app.progress_bar = gtk_builder_get_object(app.builder, "progress_window_bar");
-	app.progress_label = gtk_builder_get_object(app.builder, "progress_window_var");
-	app.backend_remove = gtk_builder_get_object(app.builder, "preferences_window_backend_remove");
-	app.backend_passes = gtk_builder_get_object(app.builder, "preferences_window_backend_passes");
-	app.application_dnd = gtk_builder_get_object(app.builder, "preferences_window_application_dnd");
-	app.application_scrollv =  gtk_builder_get_object(app.builder, "preferences_window_application_scrollv"); 
-	app.application_scrollh =  gtk_builder_get_object(app.builder, "preferences_window_application_scrollh");
-	app.preferences_window = gtk_builder_get_object(app.builder, "preferences_window"); 
-    app.shredder_window = gtk_builder_get_object(app.builder, "shredder_window");
+	app.about = GTK_WIDGET(gtk_builder_get_object(app.builder, "about"));
+	app.progress_window = GTK_WIDGET(gtk_builder_get_object(app.builder, "progress_window"));
+	app.progress_bar = GTK_WIDGET(gtk_builder_get_object(app.builder, "progress_window_bar"));
+	app.progress_label = GTK_WIDGET(gtk_builder_get_object(app.builder, "progress_window_files_var"));
+	app.backend_remove = GTK_WIDGET(gtk_builder_get_object(app.builder, "preferences_window_backend_remove"));
+	app.backend_passes = GTK_WIDGET(gtk_builder_get_object(app.builder, "preferences_window_backend_passes"));
+	app.application_dnd = GTK_WIDGET(gtk_builder_get_object(app.builder, "preferences_window_application_dnd"));
+	app.application_scrollv = GTK_WIDGET(gtk_builder_get_object(app.builder, "preferences_window_application_scrollv")); 
+	app.application_scrollh = GTK_WIDGET(gtk_builder_get_object(app.builder, "preferences_window_application_scrollh"));
+	app.preferences_window = GTK_WIDGET(gtk_builder_get_object(app.builder, "preferences_window")); 
+    app.shredder_window = GTK_WIDGET(gtk_builder_get_object(app.builder, "shredder_window"));
     gtk_widget_show_all(app.shredder_window);
     
     //loop until quit

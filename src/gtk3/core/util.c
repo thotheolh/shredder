@@ -10,14 +10,26 @@
 
 const gchar* DEFAULT_PREFS = "[Application]\ndnd=true\nscroll=true[Backend]\npasses=3\nremove=false";
 
-//get a filename from a URI
-gchar* get_name_from_uri(const gchar* uri) {
-    //find last occurrence of '/'
-    gchar* i = strrchr(uri, '/');
-    //remove '/'
-    i++;
-    //return the filename.
-    return i;
+FILE* load_file(const char *filename) {
+	//check it
+    if(!g_file_test(filename, G_FILE_TEST_EXISTS)) {
+        g_critical("Non-existent file: %s", filename);
+        return NULL;
+    }
+
+    if(!g_file_test(filename, G_FILE_TEST_IS_REGULAR)) {
+        g_critical("Directory: %s", filename);
+        return NULL;
+    }
+    //open the file
+    FILE* file = fopen(filename, "r+");
+
+    //double-check it.
+    if(!file) {
+            g_critical("Failed to open file: %s", filename);
+            return NULL;
+    }
+	return file;
 }
 
 //return the appropiate icon. Not foolproof, FIXME.
