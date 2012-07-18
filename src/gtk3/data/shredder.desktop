@@ -1,7 +1,0 @@
-[Desktop Entry]
-Type=Application
-Name=shredder
-TryExec=/usr/bin/shredder
-Exec=/usr/bin/shredder
-Icon=shredder
-Categories=Utility
