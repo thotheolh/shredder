@@ -323,11 +323,15 @@ if importStatus:
         def disable_widgets(self):
             self.toolbar.set_sensitive(False)
             self.shredbtn.set_sensitive(False)
+            self.tree.unset_rows_drag_source()
+            self.tree.unset_rows_drag_dest()
 
         ## Enables widgets
         def enable_widgets(self):
             self.toolbar.set_sensitive(True)
             self.shredbtn.set_sensitive(True)
+            self.tree.enable_model_drag_source( gtk.gdk.BUTTON1_MASK, self.TARGETS, gtk.gdk.ACTION_DEFAULT|gtk.gdk.ACTION_MOVE)
+            self.tree.enable_model_drag_dest(self.TARGETS, gtk.gdk.ACTION_DEFAULT)
 
         ## Get data when drag occurs inside the tree
         def drag_data_get_data(self, treeview, context, selection, target_id, etime):
