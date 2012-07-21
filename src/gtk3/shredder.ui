@@ -545,7 +545,6 @@ Michael Rawson &lt;michaelrawson76@gmail.com&gt;</property>
         <property name="visible">True</property>
         <property name="can_focus">False</property>
         <property name="orientation">vertical</property>
-        <property name="spacing">5</property>
         <child>
           <object class="GtkMenuBar" id="menu">
             <property name="visible">True</property>
@@ -701,6 +700,7 @@ Michael Rawson &lt;michaelrawson76@gmail.com&gt;</property>
           <object class="GtkToolbar" id="toolbar1">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
+            <property name="valign">end</property>
             <property name="toolbar_style">both</property>
             <child>
               <object class="GtkToolButton" id="toolbutton1">

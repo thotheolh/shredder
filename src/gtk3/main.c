@@ -233,6 +233,9 @@ int main(int argc, char** argv)
     app.application_scrollv = GTK_WIDGET(gtk_builder_get_object(app.builder, "preferences_window_application_scrollv"));
     app.application_scrollh = GTK_WIDGET(gtk_builder_get_object(app.builder, "preferences_window_application_scrollh"));
     app.preferences_window = GTK_WIDGET(gtk_builder_get_object(app.builder, "preferences_window"));
+    app.toolbar = GTK_WIDGET(gtk_builder_get_object(app.builder, "toolbar1"));
+	GtkStyleContext *context = gtk_widget_get_style_context(app.toolbar);
+	gtk_style_context_add_class(context, GTK_STYLE_CLASS_PRIMARY_TOOLBAR);
     app.shredder_window = GTK_WIDGET(gtk_builder_get_object(app.builder, "shredder_window"));
     gtk_widget_show_all(app.shredder_window);
 
