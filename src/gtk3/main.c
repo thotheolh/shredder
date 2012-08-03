@@ -12,6 +12,8 @@ gchar *progress_status;
 gdouble progress_proportion;
 //files left
 guint files_left;
+//if we abort
+gboolean aborted = FALSE;
 
 /*
  *App struct for sharing widgets between functions.
@@ -155,6 +157,14 @@ void on_clear()
 void on_progress_hide()
 {
     gtk_widget_hide(app.progress_window);
+    if(progress_proportion != 1.0) {
+		aborted = TRUE;
+		gtk_dialog_run(GTK_DIALOG(app.abort_dialog));
+	}
+}
+
+void abort_dialog_hide() {
+	gtk_widget_hide(app.abort_dialog);
 }
 
 //every so often, update this.
@@ -165,7 +175,7 @@ gboolean check_dialog()
     //set text from the status
     gtk_progress_bar_set_text(GTK_PROGRESS_BAR(app.progress_bar), progress_status);
     //set files remaining field.
-    gtk_label_set_text(GTK_LABEL(app.progress_label), g_strdup_printf("%i", files_left));
+    gtk_label_set_markup(GTK_LABEL(app.progress_label), g_strdup_printf("<b>%i</b>", files_left));
 
     //when done..
     if(progress_proportion == 1) {
@@ -185,6 +195,10 @@ void on_shred()
     progress_status = "Starting...";
     //reset bar
     progress_proportion = 0;
+    //reset file count
+    files_left = 0;
+    //make sure we haven't aborted
+    aborted = FALSE;
     //show the progress window
     gtk_widget_show_all(app.progress_window);
     //Periodically update the progress window, when we have some spare CPU time.
@@ -202,7 +216,7 @@ void on_quit()
     gtk_main_quit();
 }
 
-int main(int argc, char** argv)
+int main(int argc, char **argv)
 {
     //start Gtk+
     gtk_init(&argc, &argv);
@@ -234,9 +248,11 @@ int main(int argc, char** argv)
     app.application_scrollh = GTK_WIDGET(gtk_builder_get_object(app.builder, "preferences_window_application_scrollh"));
     app.preferences_window = GTK_WIDGET(gtk_builder_get_object(app.builder, "preferences_window"));
     app.toolbar = GTK_WIDGET(gtk_builder_get_object(app.builder, "toolbar1"));
+    app.abort_dialog = GTK_WIDGET(gtk_builder_get_object(app.builder, "abort_dialog"));
 	GtkStyleContext *context = gtk_widget_get_style_context(app.toolbar);
 	gtk_style_context_add_class(context, GTK_STYLE_CLASS_PRIMARY_TOOLBAR);
     app.shredder_window = GTK_WIDGET(gtk_builder_get_object(app.builder, "shredder_window"));
+    gtk_widget_grab_focus(app.icon_view);
     gtk_widget_show_all(app.shredder_window);
 
     //loop until quit

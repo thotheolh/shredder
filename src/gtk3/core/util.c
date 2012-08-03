@@ -79,13 +79,9 @@ struct prefs load_preferences() {
     }
     //get values from the loader
     pref.passes = g_key_file_get_integer(file, "Backend", "passes", NULL);
-    g_warning("%d\n", pref.passes);
     pref.remove = g_key_file_get_boolean(file, "Backend", "remove", NULL);
-    g_warning("%d\n", pref.remove);
     pref.dnd = g_key_file_get_boolean(file, "Application", "dnd", NULL);
-    g_warning("%d\n", pref.dnd);
     pref.scroll = g_key_file_get_boolean(file, "Application", "scroll", NULL);
-    g_warning("%d\n", pref.scroll);
 
     //free the key file
     g_key_file_free(file);

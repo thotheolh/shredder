@@ -19,6 +19,7 @@ gfloat current_total = 0;
 extern gdouble progress_proportion;
 extern gchar* progress_status;
 extern guint files_left;
+extern gboolean aborted;
 
 extern struct App app;
 
@@ -122,6 +123,7 @@ int count_callback(const gchar* filename, const struct stat* result, gint info, 
 //simple callback to shred files
 int shred_callback(const gchar* filename, const struct stat* result, gint info, struct FTW* more_info)
 {
+	if(aborted == TRUE) g_thread_exit(NULL);
     //set information...
     progress_status = g_path_get_basename(filename);
     //shreddit!
@@ -137,6 +139,8 @@ int shred_callback(const gchar* filename, const struct stat* result, gint info, 
 //function to get the total number of files
 void get_total()
 {
+	total_files = 0;
+	current_total = 0;
     GtkTreeIter iter;
     //get first value, or a problem if there isn't one.
     gboolean valid = gtk_tree_model_get_iter_first(GTK_TREE_MODEL(app.file_list), &iter);

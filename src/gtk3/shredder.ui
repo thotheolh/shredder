@@ -1,6 +1,43 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
   <!-- interface-requires gtk+ 3.0 -->
+  <object class="GtkMessageDialog" id="abort_dialog">
+    <property name="can_focus">False</property>
+    <property name="border_width">5</property>
+    <property name="type_hint">dialog</property>
+    <property name="skip_taskbar_hint">True</property>
+    <property name="message_type">warning</property>
+    <property name="buttons">ok</property>
+    <property name="text" translatable="yes">Abort.</property>
+    <property name="secondary_text" translatable="yes">File deletion was aborted. Some files may still be recoverable.</property>
+    <signal name="close" handler="abort_dialog_hide" swapped="no"/>
+    <signal name="response" handler="abort_dialog_hide" swapped="no"/>
+    <child internal-child="vbox">
+      <object class="GtkBox" id="messagedialog-vbox">
+        <property name="can_focus">False</property>
+        <property name="orientation">vertical</property>
+        <property name="spacing">2</property>
+        <child internal-child="action_area">
+          <object class="GtkButtonBox" id="messagedialog-action_area">
+            <property name="can_focus">False</property>
+            <property name="layout_style">end</property>
+            <child>
+              <placeholder/>
+            </child>
+            <child>
+              <placeholder/>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="pack_type">end</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
+      </object>
+    </child>
+  </object>
   <object class="GtkAboutDialog" id="about">
     <property name="can_focus">False</property>
     <property name="border_width">5</property>
@@ -435,8 +472,20 @@ Michael Rawson &lt;michaelrawson76@gmail.com&gt;</property>
         <property name="visible">True</property>
         <property name="can_focus">False</property>
         <property name="orientation">vertical</property>
-        <property name="spacing">10</property>
-        <property name="homogeneous">True</property>
+        <child>
+          <object class="GtkImage" id="image8">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="ypad">15</property>
+            <property name="stock">gtk-save</property>
+            <property name="icon-size">6</property>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
         <child>
           <object class="GtkProgressBar" id="progress_window_bar">
             <property name="visible">True</property>
@@ -448,7 +497,8 @@ Michael Rawson &lt;michaelrawson76@gmail.com&gt;</property>
           <packing>
             <property name="expand">False</property>
             <property name="fill">False</property>
-            <property name="position">0</property>
+            <property name="padding">54</property>
+            <property name="position">1</property>
           </packing>
         </child>
         <child>
@@ -459,8 +509,8 @@ Michael Rawson &lt;michaelrawson76@gmail.com&gt;</property>
               <object class="GtkLabel" id="progress_window_files_label">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="ypad">2</property>
-                <property name="label" translatable="yes">Files remaining:   </property>
+                <property name="xpad">15</property>
+                <property name="label" translatable="yes">Files remaining:</property>
                 <property name="justify">center</property>
                 <attributes>
                   <attribute name="style" value="italic"/>
@@ -476,49 +526,13 @@ Michael Rawson &lt;michaelrawson76@gmail.com&gt;</property>
               <object class="GtkLabel" id="progress_window_files_var">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
+                <property name="xpad">15</property>
+                <property name="label" translatable="yes">0</property>
               </object>
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">True</property>
-                <property name="position">1</property>
-              </packing>
-            </child>
-          </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">True</property>
-            <property name="position">1</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkBox" id="progress_window_box3">
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <child>
-              <object class="GtkLabel" id="progress_window_time_label">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="label" translatable="yes">Estimated time remaining:   </property>
-                <property name="justify">center</property>
-                <attributes>
-                  <attribute name="style" value="italic"/>
-                </attributes>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="position">0</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkLabel" id="progress_window_time_var">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="label" translatable="yes">Not implemented: FIXME</property>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
+                <property name="pack_type">end</property>
                 <property name="position">1</property>
               </packing>
             </child>
@@ -735,22 +749,6 @@ Michael Rawson &lt;michaelrawson76@gmail.com&gt;</property>
               </packing>
             </child>
             <child>
-              <object class="GtkToolButton" id="toolbutton3">
-                <property name="use_action_appearance">False</property>
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="use_action_appearance">False</property>
-                <property name="label" translatable="yes">About Shredder...</property>
-                <property name="use_underline">True</property>
-                <property name="stock_id">gtk-about</property>
-                <signal name="clicked" handler="on_about_show" swapped="no"/>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="homogeneous">True</property>
-              </packing>
-            </child>
-            <child>
               <object class="GtkToolButton" id="toolbutton4">
                 <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
@@ -760,6 +758,22 @@ Michael Rawson &lt;michaelrawson76@gmail.com&gt;</property>
                 <property name="use_underline">True</property>
                 <property name="stock_id">gtk-clear</property>
                 <signal name="clicked" handler="on_clear" swapped="no"/>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="homogeneous">True</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkToolButton" id="toolbutton3">
+                <property name="use_action_appearance">False</property>
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="use_action_appearance">False</property>
+                <property name="label" translatable="yes">About Shredder...</property>
+                <property name="use_underline">True</property>
+                <property name="stock_id">gtk-about</property>
+                <signal name="clicked" handler="on_about_show" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">False</property>
