@@ -161,10 +161,18 @@ void on_progress_hide()
 		aborted = TRUE;
 		gtk_dialog_run(GTK_DIALOG(app.abort_dialog));
 	}
+	else {
+		aborted = FALSE;
+		gtk_dialog_run(GTK_DIALOG(app.success_dialog));
+	}
 }
 
 void abort_dialog_hide() {
 	gtk_widget_hide(app.abort_dialog);
+}
+
+void success_dialog_hide() {
+	gtk_widget_hide(app.success_dialog);
 }
 
 //every so often, update this.
@@ -249,6 +257,7 @@ int main(int argc, char **argv)
     app.preferences_window = GTK_WIDGET(gtk_builder_get_object(app.builder, "preferences_window"));
     app.toolbar = GTK_WIDGET(gtk_builder_get_object(app.builder, "toolbar1"));
     app.abort_dialog = GTK_WIDGET(gtk_builder_get_object(app.builder, "abort_dialog"));
+    app.success_dialog = GTK_WIDGET(gtk_builder_get_object(app.builder, "success_dialog"));
 	GtkStyleContext *context = gtk_widget_get_style_context(app.toolbar);
 	gtk_style_context_add_class(context, GTK_STYLE_CLASS_PRIMARY_TOOLBAR);
     app.shredder_window = GTK_WIDGET(gtk_builder_get_object(app.builder, "shredder_window"));
