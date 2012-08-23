@@ -11,7 +11,6 @@ struct prefs {
     guint passes;
     gboolean remove;
     gboolean dnd;
-    gboolean scroll;
 };
 
 struct App {
@@ -19,7 +18,7 @@ struct App {
     GtkListStore *file_list;
     GtkIconTheme *icon_theme;
     struct prefs all_pref;
-    GtkWidget *progress_window, *progress_bar, *progress_label, *about, *backend_remove, *backend_passes, *application_dnd, *application_scrollv, *application_scrollh, *shredder_window, *preferences_window, *icon_view, *toolbar, *abort_dialog, *success_dialog;
+    GtkWidget *progress_window, *progress_bar, *progress_label, *about, *backend_remove, *backend_passes, *application_dnd, *shredder_window, *preferences_window, *icon_view, *toolbar, *abort_dialog, *success_dialog;
 };
 
 #endif

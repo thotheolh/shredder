@@ -130,9 +130,6 @@ void on_preferences()
     gtk_switch_set_active(GTK_SWITCH(app.backend_remove), app.all_pref.remove);
     gtk_switch_set_active(GTK_SWITCH(app.application_dnd), app.all_pref.dnd);
     gtk_range_set_value(GTK_RANGE(app.backend_passes), app.all_pref.passes);
-    //vertical scrolling is a 'TRUE' value. +vice-versa
-    if(app.all_pref.scroll) gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(app.application_scrollv), TRUE);
-    else gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(app.application_scrollh), TRUE);
     gtk_widget_show_all(app.preferences_window);
 }
 
@@ -143,7 +140,6 @@ void on_preferences_hide()
     app.all_pref.remove = gtk_switch_get_active(GTK_SWITCH(app.backend_remove));
     app.all_pref.passes = gtk_range_get_value(GTK_RANGE(app.backend_passes));
     app.all_pref.dnd = gtk_switch_get_active(GTK_SWITCH(app.application_dnd));
-    app.all_pref.scroll = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(app.application_scrollv));
     gtk_widget_hide(app.preferences_window);
 }
 
@@ -252,8 +248,6 @@ int main(int argc, char **argv)
     app.backend_remove = GTK_WIDGET(gtk_builder_get_object(app.builder, "preferences_window_backend_remove"));
     app.backend_passes = GTK_WIDGET(gtk_builder_get_object(app.builder, "preferences_window_backend_passes"));
     app.application_dnd = GTK_WIDGET(gtk_builder_get_object(app.builder, "preferences_window_application_dnd"));
-    app.application_scrollv = GTK_WIDGET(gtk_builder_get_object(app.builder, "preferences_window_application_scrollv"));
-    app.application_scrollh = GTK_WIDGET(gtk_builder_get_object(app.builder, "preferences_window_application_scrollh"));
     app.preferences_window = GTK_WIDGET(gtk_builder_get_object(app.builder, "preferences_window"));
     app.toolbar = GTK_WIDGET(gtk_builder_get_object(app.builder, "toolbar1"));
     app.abort_dialog = GTK_WIDGET(gtk_builder_get_object(app.builder, "abort_dialog"));

@@ -8,7 +8,7 @@
 
 #include "shredder.h"
 
-const gchar* DEFAULT_PREFS = "[Application]\ndnd=true\nscroll=true[Backend]\npasses=3\nremove=false";
+const gchar* DEFAULT_PREFS = "[Application]\ndnd=true\n[Backend]\npasses=3\nremove=false";
 
 FILE* load_file(const char *filename)
 {
@@ -81,7 +81,6 @@ struct prefs load_preferences() {
     pref.passes = g_key_file_get_integer(file, "Backend", "passes", NULL);
     pref.remove = g_key_file_get_boolean(file, "Backend", "remove", NULL);
     pref.dnd = g_key_file_get_boolean(file, "Application", "dnd", NULL);
-    pref.scroll = g_key_file_get_boolean(file, "Application", "scroll", NULL);
 
     //free the key file
     g_key_file_free(file);
@@ -99,7 +98,6 @@ void save_preferences(struct prefs* pref)
 
     //set values
     g_key_file_set_boolean(file, "Application", "dnd", pref->dnd);
-    g_key_file_set_boolean(file, "Application", "scroll", pref->scroll);
     g_key_file_set_integer(file, "Backend", "passes", pref->passes);
     g_key_file_set_boolean(file, "Backend", "remove", pref->remove);
 
