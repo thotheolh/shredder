@@ -57,7 +57,7 @@ struct prefs make_default_preferences() {
     fwrite(DEFAULT_PREFS, 1, g_utf8_strlen(DEFAULT_PREFS, -1), file);
     fclose(file);
     g_free(path);
-    struct prefs pref = {3, FALSE, TRUE, TRUE};
+    struct prefs pref = {3, FALSE, TRUE};
     return pref;
 }
 

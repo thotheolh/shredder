@@ -164,6 +164,9 @@ void get_total()
         //point to next set of values
         valid = gtk_tree_model_iter_next(GTK_TREE_MODEL(app.file_list), &iter);
     }
+    if(total_files == 0) {
+		progress_proportion = 1.1;
+	}
 
 }
 

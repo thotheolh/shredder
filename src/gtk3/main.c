@@ -153,9 +153,12 @@ void on_clear()
 void on_progress_hide()
 {
     gtk_widget_hide(app.progress_window);
-    if(progress_proportion != 1.0) {
+    if(progress_proportion != 1.0 && progress_proportion != 1.1) {
 		aborted = TRUE;
 		gtk_dialog_run(GTK_DIALOG(app.abort_dialog));
+	}
+	else if(progress_proportion == 1.1) {
+		aborted = FALSE;
 	}
 	else {
 		aborted = FALSE;
@@ -182,7 +185,7 @@ gboolean check_dialog()
     gtk_label_set_markup(GTK_LABEL(app.progress_label), g_strdup_printf("<b>%i</b>", files_left));
 
     //when done..
-    if(progress_proportion == 1) {
+    if(progress_proportion >= 1) {
         //Hide the progressbox.
         on_progress_hide();
         //clear the view
