@@ -46,7 +46,7 @@
     <property name="program_name">shredder</property>
     <property name="version">0.1</property>
     <property name="comments" translatable="yes">A small Gtk+ program to securely remove files.</property>
-    <property name="website">http://code.google.com/shredder</property>
+    <property name="website">http://code.google.com/p/shredder</property>
     <property name="website_label" translatable="yes">Google Code repository</property>
     <property name="authors">Tay Thotheolh &lt;twzgerald@gmail.com&gt;
 Michael Rawson &lt;michaelrawson76@gmail.com&gt;</property>
