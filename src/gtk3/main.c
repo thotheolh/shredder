@@ -208,6 +208,7 @@ void on_shred()
     aborted = FALSE;
     //show the progress window
     gtk_widget_show_all(app.progress_window);
+    gdk_window_set_cursor(gtk_widget_get_window(app.progress_window), app.loading_cursor);
     //Periodically update the progress window, when we have some spare CPU time.
     g_idle_add((gpointer)(check_dialog), NULL);
     //spawn worker thread to do work for us. Commmunicates through global variables.
@@ -255,6 +256,7 @@ int main(int argc, char **argv)
     app.toolbar = GTK_WIDGET(gtk_builder_get_object(app.builder, "toolbar1"));
     app.abort_dialog = GTK_WIDGET(gtk_builder_get_object(app.builder, "abort_dialog"));
     app.success_dialog = GTK_WIDGET(gtk_builder_get_object(app.builder, "success_dialog"));
+    app.loading_cursor = gdk_cursor_new(GDK_WATCH);
 	GtkStyleContext *context = gtk_widget_get_style_context(app.toolbar);
 	gtk_style_context_add_class(context, GTK_STYLE_CLASS_PRIMARY_TOOLBAR);
     app.shredder_window = GTK_WIDGET(gtk_builder_get_object(app.builder, "shredder_window"));
