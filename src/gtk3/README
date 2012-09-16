@@ -1,0 +1,19 @@
+Building from source:
+
+1. Dependencies. You'll need the libgtk-3-dev package, gcc, and the libglib2.0-dev package. On Debian-based systems, the command:
+
+	sudo apt-get install libgtk-3-dev gcc build-essential
+
+should install all of these for you.
+
+2. Simply run:
+
+	make
+
+in this directory to automatically build the project. 
+
+Running from source:
+
+Shredder requires the path to its UI file as a first argument. We're working on this, as it's clunky and unnecessary, but that's the way it is for now. Here's an example execution from the source tree directory:
+
+	./shredder shredder.ui
