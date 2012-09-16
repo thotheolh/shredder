@@ -233,7 +233,10 @@ int main(int argc, char **argv)
     app.file_list = gtk_list_store_new(3, G_TYPE_STRING, GDK_TYPE_PIXBUF, G_TYPE_STRING);
     app.all_pref = load_preferences();
     app.builder = gtk_builder_new();
-    gtk_builder_add_from_file(app.builder, argv[1], NULL);
+    if(gtk_builder_add_from_file(app.builder, argv[1], NULL) == 0) {
+        g_print("Usage:\n\n/path/to/executable /path/to/shredder.ui\n");
+        exit(1);
+    }
     gtk_builder_connect_signals(app.builder, NULL);
     app.icon_view = GTK_WIDGET(gtk_builder_get_object(app.builder, "icon_view"));
     gtk_icon_view_set_model(GTK_ICON_VIEW(app.icon_view), GTK_TREE_MODEL(app.file_list));
