@@ -113,12 +113,6 @@ Michael Rawson &lt;michaelrawson76@gmail.com&gt;</property>
     <property name="can_focus">False</property>
     <property name="icon_name">drive-harddisk</property>
   </object>
-  <object class="GtkAdjustment" id="preferences_window_backend_passes_adjustment">
-    <property name="lower">1</property>
-    <property name="upper">40</property>
-    <property name="step_increment">1</property>
-    <property name="page_increment">10</property>
-  </object>
   <object class="GtkWindow" id="preferences_window">
     <property name="can_focus">False</property>
     <property name="window_position">center-on-parent</property>
@@ -409,6 +403,12 @@ Michael Rawson &lt;michaelrawson76@gmail.com&gt;</property>
         </child>
       </object>
     </child>
+  </object>
+  <object class="GtkAdjustment" id="preferences_window_backend_passes_adjustment">
+    <property name="lower">1</property>
+    <property name="upper">40</property>
+    <property name="step_increment">1</property>
+    <property name="page_increment">10</property>
   </object>
   <object class="GtkWindow" id="progress_window">
     <property name="can_focus">False</property>
@@ -709,10 +709,27 @@ Michael Rawson &lt;michaelrawson76@gmail.com&gt;</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="use_action_appearance">False</property>
-                <property name="label" translatable="yes">Clear items...</property>
+                <property name="label" translatable="yes">Clear items</property>
                 <property name="use_underline">True</property>
                 <property name="stock_id">gtk-clear</property>
                 <signal name="clicked" handler="on_clear" swapped="no"/>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="homogeneous">True</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkToolButton" id="toolbutton6">
+                <property name="use_action_appearance">False</property>
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="tooltip_text" translatable="yes">Add wastebasket to files.</property>
+                <property name="use_action_appearance">False</property>
+                <property name="label" translatable="yes">Add Trash</property>
+                <property name="use_underline">True</property>
+                <property name="icon_name">user-trash</property>
+                <signal name="clicked" handler="on_trash" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -741,7 +758,7 @@ Michael Rawson &lt;michaelrawson76@gmail.com&gt;</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="use_action_appearance">False</property>
-                <property name="label" translatable="yes">Quit...</property>
+                <property name="label" translatable="yes">Quit</property>
                 <property name="use_underline">True</property>
                 <property name="icon_name">gtk-quit</property>
                 <signal name="clicked" handler="on_quit" swapped="no"/>
