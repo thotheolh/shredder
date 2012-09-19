@@ -140,6 +140,13 @@ void on_preferences_hide()
     app.all_pref.remove = gtk_switch_get_active(GTK_SWITCH(app.backend_remove));
     app.all_pref.passes = gtk_range_get_value(GTK_RANGE(app.backend_passes));
     app.all_pref.dnd = gtk_switch_get_active(GTK_SWITCH(app.application_dnd));
+    if(app.all_pref.dnd) {
+        gtk_icon_view_enable_model_drag_dest(GTK_ICON_VIEW(app.icon_view), gtk_target_entry_new("text/uri-list", 0, 0), 1, GDK_ACTION_COPY);
+        g_signal_connect(app.icon_view, "drag-data-received", G_CALLBACK (on_drop), app.file_list);
+    }
+    else {
+	gtk_icon_view_unset_model_drag_dest(GTK_ICON_VIEW(app.icon_view));
+    }
     gtk_widget_hide(app.preferences_window);
 }
 
