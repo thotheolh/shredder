@@ -142,7 +142,6 @@ void on_preferences_hide()
     app.all_pref.dnd = gtk_switch_get_active(GTK_SWITCH(app.application_dnd));
     if(app.all_pref.dnd) {
         gtk_icon_view_enable_model_drag_dest(GTK_ICON_VIEW(app.icon_view), gtk_target_entry_new("text/uri-list", 0, 0), 1, GDK_ACTION_COPY);
-        g_signal_connect(app.icon_view, "drag-data-received", G_CALLBACK (on_drop), app.file_list);
     }
     else {
 	gtk_icon_view_unset_model_drag_dest(GTK_ICON_VIEW(app.icon_view));
@@ -252,7 +251,6 @@ int main(int argc, char **argv)
     app.progress_bar = GTK_WIDGET(gtk_builder_get_object(app.builder, "progress_window_bar"));
     if(app.all_pref.dnd) {
         gtk_icon_view_enable_model_drag_dest(GTK_ICON_VIEW(app.icon_view), gtk_target_entry_new("text/uri-list", 0, 0), 1, GDK_ACTION_COPY);
-        g_signal_connect(app.icon_view, "drag-data-received", G_CALLBACK (on_drop), app.file_list);
     }
     app.icon_theme = gtk_icon_theme_get_default();
     app.about = GTK_WIDGET(gtk_builder_get_object(app.builder, "about"));
@@ -271,6 +269,7 @@ int main(int argc, char **argv)
 	gtk_style_context_add_class(context, GTK_STYLE_CLASS_PRIMARY_TOOLBAR);
     app.shredder_window = GTK_WIDGET(gtk_builder_get_object(app.builder, "shredder_window"));
     gtk_widget_grab_focus(app.icon_view);
+    g_signal_connect(app.icon_view, "drag-data-received", G_CALLBACK (on_drop), app.file_list);
     gtk_widget_show_all(app.shredder_window);
 
     //loop until quit
