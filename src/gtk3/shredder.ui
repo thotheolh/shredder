@@ -553,7 +553,7 @@ Michael Rawson &lt;michaelrawson76@gmail.com&gt;</property>
                     </child>
                     <child>
                       <object class="GtkImageMenuItem" id="menu_file_open_trash">
-                        <property name="label" translatable="yes">Add wastebasket</property>
+                        <property name="label" translatable="yes">Add trash</property>
                         <property name="use_action_appearance">False</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>

@@ -8,7 +8,7 @@
 
 #include "shredder.h"
 
-const gchar* DEFAULT_PREFS = "[Application]\ndnd=true\n[Backend]\npasses=3\nremove=false";
+const gchar* DEFAULT_PREFS = "[Application]\ndnd=true\n[Backend]\npasses=3\nremove=true";
 
 FILE* load_file(const char *filename)
 {
@@ -57,7 +57,7 @@ struct prefs make_default_preferences() {
     fwrite(DEFAULT_PREFS, 1, g_utf8_strlen(DEFAULT_PREFS, -1), file);
     fclose(file);
     g_free(path);
-    struct prefs pref = {3, FALSE, TRUE};
+    struct prefs pref = {3, TRUE, TRUE};
     return pref;
 }
 
