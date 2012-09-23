@@ -36,18 +36,31 @@ void on_about_hide()
     gtk_widget_hide(app.about);
 }
 
+gboolean not_already_selected(const char *in_filename) {
+    GtkTreeIter iter;
+    gboolean valid = gtk_tree_model_get_iter_first(GTK_TREE_MODEL(app.file_list), &iter);
+    gchar* filename;
+    while(valid) {
+    	gtk_tree_model_get(GTK_TREE_MODEL(app.file_list), &iter, COL_URI, &filename, -1);
+        if(g_str_equal(filename, in_filename)) return FALSE;
+	valid = gtk_tree_model_iter_next(GTK_TREE_MODEL(app.file_list), &iter);
+   }
+   return TRUE;
+}
+
 //on using menu to add wastebasket
 void on_trash()
 {
     gchar* trash = g_strjoin(NULL, g_getenv("HOME"), "/.local/share/Trash/files", NULL);
 
     //insert values
+    if(not_already_selected(trash)) {
     gtk_list_store_insert_with_values(app.file_list, NULL, -1,
                                       COL_NAME, "Trash",
                                       COL_PIXBUF, gtk_icon_theme_load_icon(app.icon_theme, "user-trash", 48, 0, NULL),
                                       COL_URI, trash,
                                       -1);
-
+    }
     g_free(trash);
 }
 
@@ -61,7 +74,7 @@ void on_open()
                              NULL));
 
     //if we don't cancel
-    if(gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_ACCEPT) {
+    if((gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_ACCEPT) && not_already_selected(gtk_file_chooser_get_filename(dialog))) {
 
         //insert values
         gtk_list_store_insert_with_values(app.file_list, NULL, -1,
@@ -84,8 +97,7 @@ void on_open_folder()
                              NULL));
 
     //if we don't cancel
-    if(gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_ACCEPT) {
-
+    if((gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_ACCEPT) && (not_already_selected(gtk_file_chooser_get_filename(dialog))))  {
         //insert values
         gtk_list_store_insert_with_values(app.file_list, NULL, -1,
                                           COL_NAME, g_path_get_basename(gtk_file_chooser_get_filename(dialog)),
@@ -111,11 +123,13 @@ void on_drop(GtkWidget* icon_view, GdkDragContext *drag_context, int x, int y, G
         gchar* filename = g_path_get_basename(uri);
 
         //insert values
-        gtk_list_store_insert_with_values(app.file_list, NULL, -1,
+        if(not_already_selected(uri)) {
+            gtk_list_store_insert_with_values(app.file_list, NULL, -1,
                                           COL_NAME, filename,
                                           COL_PIXBUF, get_icon_from_filename(uri, app.icon_theme),
                                           COL_URI, uri,
                                           -1);
+        }
         split_uris_with_protocol++;
     }
 
