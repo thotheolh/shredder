@@ -1,8 +1,8 @@
 #include <gtk/gtk.h>
 #include <string.h>
 #include <stdlib.h>
-#include "core/shredder.h"
-#include "core/util.h"
+#include "shredder.h"
+#include "util.h"
 /*
  *Global variables for passing between threads
  */
