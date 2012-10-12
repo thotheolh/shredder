@@ -6,7 +6,7 @@ from util import *
 ## This class does NOT handle the File I/O of the actual settings. They are to simply handle, hold and translate settings.
 class settings():
 
-    version = "2.0 (Beta)" #Hard code version.
+    version = "1.0" #Hard code version.
     iterations = "5"            #Default.
     remove_shredded = False  #Default.
     zero = True              #Default.
