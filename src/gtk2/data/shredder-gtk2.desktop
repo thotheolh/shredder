@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=shredder-gtk2
+TryExec=/usr/bin/shredder-gtk2
+Exec=/usr/bin/shredder-gtk
+Icon=drive-harddisk
+Categories=Utility
