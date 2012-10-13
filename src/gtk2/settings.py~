@@ -21,7 +21,7 @@ class settings():
 
     ## Gets settings. Calls I/O to read files settings and load in. Checks if local directory is writable, else use home directory for configs.
     def get(self):
-        self.props_file = self.util.get_resource(self.props_fname)
+        self.props_file = self.util.get_resource(props_fname)
 	if not os.access(self.props_file, os.W_OK):
             shome = os.getenv("HOME") + "/.shredder/"
             if not os.path.exists(shome):
