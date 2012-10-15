@@ -79,6 +79,10 @@ if importStatus:
             self.zerolbl = gtk.Label("Zero-ing: ")
             self.removelbl = gtk.Label("Remove: ")
 
+            ## Buttons
+            self.shredbtn = gtk.Button()
+            self.shredbtn.connect("clicked", self.do_shred, None)
+
             ## Spin Buttons
             self.adjustments = gtk.Adjustment(int(self.settings.get_shred_iterations()),1,sys.float_info.max, 1, 10, 0)
             self.check_iterations = gtk.SpinButton()
@@ -89,6 +93,8 @@ if importStatus:
             # Shred image
             self.shredimg = gtk.Image()
             self.shredimg.set_from_file(util().get_resource("img/shredder24.png"))
+            self.shredbtn.add(self.shredimg)
+            
             # Filechooser image
             self.fileimg = gtk.Image()
             self.fileimg.set_from_file(util().get_resource("img/file.png"))
@@ -137,8 +143,11 @@ if importStatus:
             self.tree.connect("drag_data_received", self.drag_data_received_data)
             self.scrolltree.add(self.tree)
 
+            ## Shred button
+            self.shredtooltip = gtk.Tooltips()
+            self.shredtooltip.set_tip(self.shredbtn, "Begin Shredding Files")
+
             ## Adding items to toolbar
-            self.toolbar.append_item("Shred", "Begin shredding files", "Private", self.shredimg, self.do_shred)
             self.toolbar.append_item("Add File", "Choose a file", "Private", self.fileimg, self.get_filechooser_callback)
             self.toolbar.append_item("Add Folder", "Choose a folder", "Private", self.folderimg, self.get_folderchooser_callback)
             self.toolbar.append_item("Add Trash", "Shred Trash bin", "Private", self.trashimg, self.shred_trash)
@@ -170,11 +179,14 @@ if importStatus:
 
             # treebox to contain treeview
             self.treebox = gtk.HBox(homogeneous=False, spacing=0)
-            self.vbox.pack_start(self.scrolltree, expand=True, fill=True, padding=0)
+            self.vbox.pack_start(self.scrolltree, expand=True, fill=True, padding=0)        
+            self.shredbox = gtk.HBox(homogeneous=False, spacing=0)
+            self.shredbox.pack_end(self.shredbtn, expand=False, fill=False, padding=5)
             
             # Overall VBox
             self.mainbox = gtk.VBox(homogeneous=False, spacing=0)
             self.mainbox.pack_start(self.vbox, expand=True, fill=True, padding=0)
+            self.mainbox.pack_start(self.shredbox, expand=False, fill=False, padding=5)
             self.statusbox = gtk.HBox(homogeneous=False, spacing=0)
             self.statusbox.pack_start(self.statuslbl, expand=False, fill=False, padding=0)
             self.separator = gtk.HSeparator()
@@ -295,12 +307,14 @@ if importStatus:
         ## Disables widget
         def disable_widgets(self):
             self.toolbar.set_sensitive(False)
+            self.shredbtn.set_sensitive(False)
             self.tree.unset_rows_drag_source()
             self.tree.unset_rows_drag_dest()
 
         ## Enables widgets
         def enable_widgets(self):
             self.toolbar.set_sensitive(True)
+            self.shredbtn.set_sensitive(True)
             self.tree.enable_model_drag_source( gtk.gdk.BUTTON1_MASK, self.TARGETS, gtk.gdk.ACTION_DEFAULT|gtk.gdk.ACTION_MOVE)
             self.tree.enable_model_drag_dest(self.TARGETS, gtk.gdk.ACTION_DEFAULT)
 
