@@ -1,0 +1,1 @@
+A GUI frontend for the "shred" command in Linux.
